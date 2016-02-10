@@ -1,0 +1,104 @@
+# Image Visualization
+
+## Introduction
+### Purpose
+
+The standard user interface of most image-centric social media services display 
+images and data in a linear fasion. This project seeks to expore alternative 
+perspectives of the universe of the internal represenations of one of these
+services.
+
+### Definitions
+
+* Graph
+* Edge
+* Node
+* Image
+* Latitude
+* Longitude
+* Datetime
+* Meta-data
+* Tags
+
+### System Overview
+
+#### Core Technologies
+
+* Processing Programming Language [[link]()]
+* Python Programming Language [[link]()]
+
+#### Collection
+
+A python script will make calls to an API requesting posts from
+predefined geographical areas. The targeted information from each post will be 
+as follows:
+
+* User name
+* Following
+* Followers
+* Image
+* Image metadata
+	* Latitude
+	* Longitude
+	* Datetime
+
+This data will then be inserted into a database.
+
+#### Visualization
+
+### References
+## Overall Description
+### Product Perspective
+#### System Interfaces
+#### User Interfaces
+
+Digital Map
+
+Carosel
+
+#### Hardware Interfaces
+#### Software Interfaces
+#### Communcation Interfaces
+#### Memory Constraints
+#### Operations
+#### Site Adaption Requirements
+### Product Functions
+### User Characteristics
+### Contraints
+
+* API query restraints
+* Restricted from private accounts
+
+### Assumptions
+### Dependencies
+## Specific Requirements
+### External Interface Requirements
+### Functional Requirements
+
+#### User Stories
+
+1. User opens application
+2. Digital map is focused on user's position
+3. User hovers over node
+4. Image expands
+5. User clicks on node
+6. Corosel UI is presented 
+	--- How, in what order? Doesn't this re-linearize the data? ---
+
+### Performace Requirements
+### Design Contraints
+### Logical Database Requirement
+### Software System Attributes
+#### Reliability
+#### Availability
+#### Security
+#### Maintainability
+#### Portability
+
+* Processing is a Java derivative and is cross-platform
+* Project can compiled to javascript [[link](http://processingjs.org/)]
+
+## Visualization
+* 2 demensional graph
+* edges representing distance (haversine)
+* image carosel 
