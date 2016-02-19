@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Monitor</title>
+<script>
+	console.log('Monitor Starting');
+	console.log(safari.application.activeBrowserWindow.tabs);
+
+	function activateTimer(tab) {
+
+	}
+
+	function deactivateTimer(tab) {
+
+	}
+
+	function openHandler(openEvent) {
+		console.log(openEvent);
+	}
+
+	function closeHandler(closeEvent) {
+		console.log(closeEvent);
+	}
+
+	safari.application.addEventListener("open", openHandler, true);
+	safari.application.addEventListener("close", closeHandler, true);
+</script>
+</head>
+<body>
+	Monitor
+</body>
+</html>
