@@ -1,15 +1,21 @@
-{
-	'tab': '',
+[{
+	'tab': 'parent',
 	'sessionStart': '',
-	'parent': '',
+	'parent': null,
 	'childSessions': [
-		child1,
-		child2
+		'link followed inside parent',
 	]
-}
+},
+	'tab': 'link followed inside parent',
+	'sessionStart': '',
+	'parent': 'parent',
+	'childSessions': [
+    ...
+	]
+}]
 
 [ ] handle child session detection
-	- in the injected script we need to create a onclick
+	[x] in the injected script we need to create a onclick
 		listener for each link on the page. This onlclick
 		listener should send a message to the extension
 		indicating that the next page being visited is a child
@@ -17,6 +23,10 @@
 	- the extension will then create a new session object
 		with the parent key set to the the previous session
 [ ] handle search bar searches
-	- follow parent references to top level parent
+	[x] follow parent references to top level parent
 		and start new child tree
 [ ] handle parent session logging 
+[ ] handle redirects by ignoring them
+[ ] handle the entire browser closing
+[ ] handle back button links
+[ ] handle export of objects
