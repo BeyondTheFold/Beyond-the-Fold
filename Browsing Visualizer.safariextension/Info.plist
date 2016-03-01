@@ -28,6 +28,16 @@
 			</dict>
 		</array>
 	</dict>
+	<key>Content</key>
+	<dict>
+		<key>Scripts</key>
+		<dict>
+			<key>End</key>
+			<array>
+				<string>test.js</string>
+			</array>
+		</dict>
+	</dict>
 	<key>DeveloperIdentifier</key>
 	<string>0000000000</string>
 	<key>ExtensionInfoDictionaryVersion</key>

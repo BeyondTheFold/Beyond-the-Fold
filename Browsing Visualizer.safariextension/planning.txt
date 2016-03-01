@@ -1,0 +1,22 @@
+{
+	'tab': '',
+	'sessionStart': '',
+	'parent': '',
+	'childSessions': [
+		child1,
+		child2
+	]
+}
+
+[ ] handle child session detection
+	- in the injected script we need to create a onclick
+		listener for each link on the page. This onlclick
+		listener should send a message to the extension
+		indicating that the next page being visited is a child
+		of the last page.
+	- the extension will then create a new session object
+		with the parent key set to the the previous session
+[ ] handle search bar searches
+	- follow parent references to top level parent
+		and start new child tree
+[ ] handle parent session logging 

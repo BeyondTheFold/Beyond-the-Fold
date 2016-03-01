@@ -5,13 +5,28 @@
 <script>
 	console.log('Monitor Starting');
 
-	var tabSessions = [];
-	var currentTab;
-	var currentTabStartTime = 0;
+	//console.log(safari.application.activeBrowserWindow.tabs);
+
+	var sessions = [];
+	var lastNavigatedTo;
+	var active;
+	var activeStartTime = 0;
+	var previousState;
+	var links;
+
+	var stateEnum = {
+		OPEN: 0,
+		CLOSE: 1,
+		ACTIVE: 2,
+		UNACTIVE: 3,
+		PRE_NAVIGATION: 4,
+		NAVIGATION: 5,
+		PRE_SEARCH: 6
+	};
 
 	function printTabSessions() {
-		for(var i = 0; i < tabSessions.length; ++i) {
-			console.log(tabSessions[i]);
+		for(var i = 0; i < sessions.length; ++i) {
+			console.log(sessions[i]);
 		}
 	}
 
@@ -24,25 +39,32 @@
 	}
 
 	function openHandler(openEvent) {
+		console.log("Tab/Page Open");
 
+		sessions.push({
+			'tab': openEvent.target,
+			'sessionStart': new Date(),
+			'sessionDuration': 0,
+			'parent': '',
+			'children': []
+		});
+
+		console.log(sessions);
 	}
 
 	function closeHandler(closeEvent) {
+		console.log("Tab/Page Open");
 	}
 
 	function activationHandler(activationEvent) {
-		printTabSessions();
+		console.log("Tab/Page Activation");
 
-		// define current tab
-		currentTab = activationEvent.target.title;
-
-		// set start time to current time
-		currentTabStartTime = new Date();
+		active = activationEvent.target;
 	}
 
-	function getTabIndex(title) {
-		for(var i = 0; i < tabSessions.length; i++) {
-			if(tabSessions[i].title == title) {
+	function getSessionIndex(session) {
+		for(var i = 0; i < sessions.length; i++) {
+			if(sessions[i].tab == session) {
 				return(i);
 			}
 		}
@@ -50,27 +72,51 @@
 	}
 
 	function deactivationHandler(deactivationEvent) {
-
-		// if tabs are open but current tab start time has not been defined
-		if(currentTabStartTime != 0) {
-			// subtract current tab start time from current time and add to total session duration
-			var i = getTabIndex(deactivationEvent.target.title);
-			console.log(i);
-			if(i) {
-				tabSessions[i].sessionDuration += new Date() - currentTabStartTime;
-			}
+		// subtract current tab start time from current time and add to total session duration
+		var i = getSessionIndex(deactivationEvent.target);
+		if(i) {
+			sessions[i].sessionDuration += new Date() - sessions[i].sessionStart;
 		}
 	}
 
-	function navigationHandler(navigationEvent) {
-		tabSessions.push({'title': navigationEvent.target.title, 'sessionBegin': Date(), 'sessionDuration': 0});
+	function beforeNavigationHandler(beforeNavigationEvent) {
+		console.log('Before Navigation');
 	}
 
+	function navigationHandler(navigationEvent) {
+		console.log('Navigation');
+
+		console.log(navigationEvent.target.url);
+		if(links) {
+			for(var i = 0; i < links.length; ++i) {
+				if(links[i] == navigationEvent.target.url) {
+					//sessions[getSessionIndex(active)].children.push(beforeNavigationEvent);
+					console.log("WOOOOO!");
+				}	
+			}
+		}
+
+		safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("get_links");
+	}
+
+	function beforeSearchHandler(beforeSearchEvent) {
+		console.log('Before Search');
+		
+	}
+
+	function messageHandler(message) {
+		links = message.message;
+		console.log(links);
+	}
+
+	safari.application.addEventListener("message", messageHandler, false);
 	safari.application.addEventListener("open", openHandler, true);
 	safari.application.addEventListener("close", closeHandler, true);
 	safari.application.addEventListener("activate", activationHandler, true);
 	safari.application.addEventListener("deactivate", deactivationHandler, true);
 	safari.application.addEventListener("navigate", navigationHandler, true);
+	safari.application.addEventListener("beforeNavigate", beforeNavigationHandler, true);
+	safari.application.addEventListener("beforeSearch", beforeSearchHandler, true);
 </script>
 </head>
 <body>
