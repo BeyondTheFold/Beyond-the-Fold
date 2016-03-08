@@ -27,6 +27,8 @@
 				<string></string>
 			</dict>
 		</array>
+		<key>Database Quota</key>
+		<integer>104857600</integer>
 	</dict>
 	<key>Content</key>
 	<dict>

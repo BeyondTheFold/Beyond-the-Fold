@@ -4,15 +4,20 @@
 	'parent': null,
 	'childSessions': [
 		'link followed inside parent',
-	]
+	],
+	'current': false,
+	'previous': false,
 },
 	'tab': 'link followed inside parent',
 	'sessionStart': '',
 	'parent': 'parent',
 	'childSessions': [
     ...
-	]
+	],
+	'current': false,
+	'previous': false,
 }]
+
 
 [ ] handle child session detection
 	[x] in the injected script we need to create a onclick
@@ -30,3 +35,5 @@
 [ ] handle the entire browser closing
 [ ] handle back button links
 [ ] handle export of objects
+
+If you visit a node on a different branch what happens?
