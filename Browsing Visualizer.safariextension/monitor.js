@@ -62,7 +62,7 @@ function saveSessions() {
     var session = sessions[i];
     
     // filter out nodes representing redirects
-    if(session[i].duration > 0) {
+    if(sessions[i].sessionDuration > 0) {
       output.push({
         'url': session.url, 
         'sessionStart': session.sessionStart, 
@@ -74,9 +74,8 @@ function saveSessions() {
   }
   
   debugLog('Session saved');
-  localStorage.setItem('sessions', JSON.stringify(output));
+  localStorage.setItem('sessions', '{' + JSON.stringify(output) + '}');
   console.log(localStorage.getItem('sessions'));
-  
 }
 
 

@@ -39,3 +39,7 @@
   - HTML5 local storage in JSON format
 [ ] write test cases
 [ ] parse Google url's for child URL visit detection
+[ ] detect innactive periods when user has left the browser
+  [ ] threshold of time sense scrolled or mouse movement
+  [ ] consider if a user is watching a video
+    [ ] fullscreenchange event when a full screen is enabled/disabled
