@@ -21,17 +21,80 @@ function debugLog(output) {
   }
 }
 
-function getRoot(index) {
-  debugLog('Searching for root node of node ' + String(index));
+function createNode(parent, children, current, previous, tab, url) {
+  return({
+    'tab': tab,
+    'url': url,
+    'sessionStart': new Date(),
+    'sessionDuration': 0,
+    'parent': parent,
+    'children': children,
+    'current': true,
+    'previous': false
+  });
+}
+
+/*
+// restore session
+var tabs = safari.application.activeBrowserWindow.tabs;
+var activeTab = safari.application.activeBrowserWindow.activeTab;
+var current;
+for(var i = 0; i < tabs.length; ++i) {
+  // if tab is the active tap set the current key value to true
+  if(tabs[i] == activeTab) {
+    current = true;
+    currentIndex = i;
+  } else {
+    current = false;
+  }
   
-  if(index === null || typeof index === undefined) {
-    console.log('Error: index is null or undefined');
+  sessions.push(createNode(null, [], current, null, tabs[i], tabs[i].url));
+}
+*/
+
+function calculateDuration(index) {
+  sessions[index].sessionDuration += new Date() - sessions[index].sessionStart;
+}
+
+function saveSessions() {
+  output = [];
+  for(var i = 0; i < sessions.length; ++i) {
+    var session = sessions[i];
     
-    return null;
+    // filter out nodes representing redirects
+    if(session[i].duration > 0) {
+      output.push({
+        'url': session.url, 
+        'sessionStart': session.sessionStart, 
+        'sessionDuration': session.sessionDuration, 
+        'parent': session.parent, 
+        'child': session.child
+      });
+    }
+  }
+  
+  debugLog('Session saved');
+  localStorage.setItem('sessions', JSON.stringify(output));
+  console.log(localStorage.getItem('sessions'));
+  
+}
+
+
+
+function getRoot(sessions, index) {
+  if(index === null || typeof index === undefined) {
+    return(null);
   }
   
   var i = index;
-  while(sessions[i].parent !== null) {
+	var iterationCount = 0;
+	var maxIteration = sessions.length;
+  while(sessions[i].parent !== null && typeof sessions[i].parent !== undefined) {
+		if(iterationCount >= maxIteration) {
+			debugLog('getRoot(...) stuck in cycle at ' + String(i) + ' and ' + String(sessions[i].parent));
+			return(null);
+		}
+		++iterationCount;
     i = sessions[i].parent;
   }
   return(i);
@@ -44,6 +107,15 @@ function getCurrentIndex() {
     if(sessions[i].current === true) {
       debugLog('Found current node at ' + String(i));
       
+      return(i);
+    }
+  }
+  return(null);
+}
+
+function getIndexOfTab(tab) {
+  for(var i = 0; i < sessions.length; ++i) {
+    if(sessions[i].tab === tab) {
       return(i);
     }
   }
@@ -63,12 +135,8 @@ function getPreviousIndex() {
   return(null);
 }
 
-function calculateDuration(index) {
-  sessions[index].sessionDuration += new Date() - sessions[index].sessionStart;
-}
-
 function openHandler(openEvent) {
-  console.log("Tab/Page Open");
+  debugLog("Tab/Page Open");
 
   // when new tab or window is opened push parent object
   sessions.push({
@@ -87,15 +155,17 @@ function openHandler(openEvent) {
 }
 
 function closeHandler(closeEvent) {
-  console.log("Tab/Page Open");
+  debugLog("Tab/Page Open");
 
   if(currentIndex !== null) {
     calculateDuration(currentIndex);
   }
+  
+  saveSessions();
 }
 
 function activationHandler(activationEvent) {
-  console.log("Tab/Page Activation");
+  debugLog("Tab/Page Activation");
 
   // get current active session index for tab
   currentIndex = getCurrentIndex();
@@ -112,61 +182,50 @@ function deactivationHandler(deactivationEvent) {
 }
 
 function beforeNavigationHandler(beforeNavigationEvent) {
-  console.log('Before Navigation');
+  debugLog('Before Navigation');
 
   previouslyNavigatedTo = beforeNavigationEvent.target;
-}
-
-function visited_recursive(index, url) {
-  var children = sessions[index].children;
-  
-  if(children.length === 0) {
-    return null;
-  }
-  
-  if(sessions[index].url === url) {
-    return index;
-  }
-  
-  for(var i = 0; i < children.length; ++i) {
-    var result = visited_recursive(i, url);
-    if(result !== null) {
-      return result;
-    }
-  }
 }
 
 function visited(url) {
   debugLog('Searching visited nodes for URL: ' + url);
   
   // get root index in current tree
-  var rootIndex = getRoot(currentIndex);
+  var rootIndex = getRoot(sessions, currentIndex);
   
   if(rootIndex === null || typeof rootIndex === undefined) {
     debugLog('Root node not found');
-    
-    return null;
+
+    return(null);
   }
   
-  return visited_recursive(rootIndex, url);
+  for(var i = 0; i < sessions.length; ++i) {
+    if(sessions[i].url === url && getRoot(sessions, i) === rootIndex) {
+      return(i);
+    }
+  }
+ 
+  return(null);
 }
 
 function navigationHandler(navigationEvent) {
-  console.log('Navigation');
+  debugLog('Navigation');
 
   // find if navigated to URL has been visited 
   var visitedIndex = visited(navigationEvent.target.url);
   
   // if URL has been visited
-  if(visitedIndex !== null || typeof visitedIndex === undefined) {
-    console.log('Revisiting node');
+  if(visitedIndex !== null && typeof visitedIndex !== undefined) {
+    debugLog('Revisiting node');
     
     // set context to node visited index
     currentIndex = visitedIndex;
     previousIndex = null;
     sessions[visitedIndex].current = true;
-    sessions[vsisitdIndex].previous = false;
+    sessions[visitedIndex].previous = false;
   } else {
+    debugLog('Visiting new node');
+    
     // create new session object
     sessions.push({
       'tab': navigationEvent.target,
@@ -179,25 +238,31 @@ function navigationHandler(navigationEvent) {
       'previous': false
     });
   
-    if(currentIndex !== null) {
-      // calculate session duration
-      sessions[currentIndex].sessionDuration += new Date() - sessions[currentIndex].sessionStart;
-   
-      // set parent to session tree root
-      sessions[currentIndex].parent = getRoot(currentIndex);
-   
-      // set parent current flag to false
-      sessions[currentIndex].current = false;
-   
-      // set parent previous flag to true
-      sessions[currentIndex].previous = true;
-    }
-  
     // swap index points
     previousIndex = currentIndex;
     currentIndex = sessions.length - 1;
   
+    // calculate session duration
+    sessions[currentIndex].sessionDuration += new Date() - sessions[currentIndex].sessionStart;
+    
+
+   
+    // set parent current flag to false
+    sessions[currentIndex].current = true;
+   
+    // set parent previous flag to true
+    sessions[currentIndex].previous = false;
+    
+    if(previousIndex !== null) {
+      // set parent to previously visited index
+      sessions[currentIndex].parent = previousIndex;
+      sessions[previousIndex].current = false;
+      sessions[previousIndex].previous = true;
+    }
+  
     if(nextNavigatedToIsChild) {
+      debugLog('Visited child URL');
+      
       // set new node's parent to previous index
       sessions[currentIndex].parent = previousIndex;
   
@@ -211,15 +276,15 @@ function navigationHandler(navigationEvent) {
       nextNavigatedToIsChild = false;
     }
   }
-
-  console.log(sessions);
+  
+  debugLog(sessions);
 }
 
 function beforeSearchHandler(beforeSearchEvent) {
-  console.log('Before Search');
+  debugLog('Before Search');
 
   calculateDuration(currentIndex);
-  var rootIndex = getRoot(currentIndex);
+  var rootIndex = getRoot(sessions, currentIndex);
 
   sessions.push({
     'tab': beforeSearchEvent.target,
@@ -250,3 +315,4 @@ safari.application.addEventListener("deactivate", deactivationHandler, true);
 safari.application.addEventListener("navigate", navigationHandler, true);
 safari.application.addEventListener("beforeNavigate", beforeNavigationHandler, true);
 safari.application.addEventListener("beforeSearch", beforeSearchHandler, true);
+safari.application.addEventListener('command', saveSessions, false);

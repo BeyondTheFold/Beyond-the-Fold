@@ -19,7 +19,7 @@
 }]
 
 
-[ ] handle child session detection
+[x] handle child session detection
 	[x] in the injected script we need to create a onclick
 		listener for each link on the page. This onlclick
 		listener should send a message to the extension
@@ -27,13 +27,15 @@
 		of the last page.
 	- the extension will then create a new session object
 		with the parent key set to the the previous session
-[ ] handle search bar searches
+[x] handle search bar searches
 	[x] follow parent references to top level parent
 		and start new child tree
-[ ] handle parent session logging 
 [ ] handle redirects by ignoring them
-[ ] handle the entire browser closing
-[ ] handle back button links
+  [x]ignore or remove any nodes that have a duration of 0
+  [ ] write test to assert that redirects are filtered out when saving
+[x] handle back button navigation
+[x] handle forward button navigation
 [ ] handle export of objects
-
-If you visit a node on a different branch what happens?
+  - HTML5 local storage in JSON format
+[ ] write test cases
+[ ] parse Google url's for child URL visit detection
