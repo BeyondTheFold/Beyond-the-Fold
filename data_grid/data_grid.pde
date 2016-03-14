@@ -10,7 +10,5 @@ void setup() {
 }
 
 void draw() {
-  float timeAccessed = 600;
-  float timeConverted = map(timeAccessed, 0, 1440, 0, 360); 
-  angle = timeConverted * 360 / 24;
+
 }

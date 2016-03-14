@@ -16,19 +16,19 @@ void drawGrid(){
   }
   
   strokeWeight(0.5);
-  for(int i = 0; i < 24; i++) {
-        angle = i * 360 / 24;
-        drawHandle(0.025*diagramSize, diagramSize/2);
+  for(int i = 0; i < 12; i++) {
+        angle = i * 360 / 12;
+        drawGridSpokes(0.025*diagramSize, diagramSize/2);
   }
   
   strokeWeight(1.2);
   for(int i = 0; i < 4; i++) {
         angle = i * 360 / 4;
-        drawHandle(0.01875*diagramSize, diagramSize/2);
+        drawGridSpokes(0.01875*diagramSize, diagramSize/2);
   }
 }
 
-void drawHandle(float inside, float outside) {
+void drawGridSpokes(float inside, float outside) {
     float xin  = sin(radians(-angle - 180)) * inside;
     float yin  = cos(radians(-angle - 180)) * inside;
     float xout = sin(radians(-angle - 180)) * outside;
