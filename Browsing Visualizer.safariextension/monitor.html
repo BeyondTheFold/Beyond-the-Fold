@@ -1,79 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-<title>Monitor</title>
-<script>
-	console.log('Monitor Starting');
-
-	var tabSessions = [];
-	var currentTab;
-	var currentTabStartTime = 0;
-
-	function printTabSessions() {
-		for(var i = 0; i < tabSessions.length; ++i) {
-			console.log(tabSessions[i]);
-		}
-	}
-
-	function activateTimer(tab) {
-
-	}
-
-	function deactivateTimer(tab) {
-
-	}
-
-	function openHandler(openEvent) {
-
-	}
-
-	function closeHandler(closeEvent) {
-	}
-
-	function activationHandler(activationEvent) {
-		printTabSessions();
-
-		// define current tab
-		currentTab = activationEvent.target.title;
-
-		// set start time to current time
-		currentTabStartTime = new Date();
-	}
-
-	function getTabIndex(title) {
-		for(var i = 0; i < tabSessions.length; i++) {
-			if(tabSessions[i].title == title) {
-				return(i);
-			}
-		}
-		return(false);
-	}
-
-	function deactivationHandler(deactivationEvent) {
-
-		// if tabs are open but current tab start time has not been defined
-		if(currentTabStartTime != 0) {
-			// subtract current tab start time from current time and add to total session duration
-			var i = getTabIndex(deactivationEvent.target.title);
-			console.log(i);
-			if(i) {
-				tabSessions[i].sessionDuration += new Date() - currentTabStartTime;
-			}
-		}
-	}
-
-	function navigationHandler(navigationEvent) {
-		tabSessions.push({'title': navigationEvent.target.title, 'sessionBegin': Date(), 'sessionDuration': 0});
-	}
-
-	safari.application.addEventListener("open", openHandler, true);
-	safari.application.addEventListener("close", closeHandler, true);
-	safari.application.addEventListener("activate", activationHandler, true);
-	safari.application.addEventListener("deactivate", deactivationHandler, true);
-	safari.application.addEventListener("navigate", navigationHandler, true);
-</script>
-</head>
-<body>
-	Monitor
-</body>
+  <head>
+    <title>Monitor</title>
+    <script type="text/javascript" src="monitor.js"></script>
+    <script type="text/javascript" src="tests.js"></script>
+  </head>
+  <body>
+    Monitor
+  </body>
 </html>

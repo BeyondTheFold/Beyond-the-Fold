@@ -27,6 +27,31 @@
 				<string></string>
 			</dict>
 		</array>
+		<key>Database Quota</key>
+		<integer>104857600</integer>
+		<key>Toolbar Items</key>
+		<array>
+			<dict>
+				<key>Identifier</key>
+				<string>button</string>
+				<key>Image</key>
+				<string>button.png</string>
+				<key>Include By Default</key>
+				<true/>
+				<key>Label</key>
+				<string>Button</string>
+			</dict>
+		</array>
+	</dict>
+	<key>Content</key>
+	<dict>
+		<key>Scripts</key>
+		<dict>
+			<key>End</key>
+			<array>
+				<string>injection.js</string>
+			</array>
+		</dict>
 	</dict>
 	<key>Content</key>
 	<dict>
