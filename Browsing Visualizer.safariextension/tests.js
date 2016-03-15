@@ -12,14 +12,14 @@ function testGetRoot() {
 	test_sessions.push(createNode(0, []));
 	test_sessions.push(createNode(0, []));
 
-	//assert(getRoot(test_sessions, 0) === null, 'Root of root node did not return null');
+	assert(getRoot(test_sessions, 0) === 0, 'Root of root node did not root node index');
 	assert(getRoot(test_sessions, 1) === 0, 'Root of child incorrect');
 
   console.log('testGetRoot() passed');
 }
 
 function testVisited() {
-  sessions.push(createNode(null, [], true, null, null, 'https://www.google.com'));
+  sessions.push(createNode(null, [], true, null, 'https://www.google.com'));
   currentIndex = 0;
   assert(visited('https://www.google.com') === 0, 'Previously visited URL not detected');
   
@@ -43,6 +43,7 @@ function testOpenHandler() {
   
   console.log('testOpenHandler() passed');
   */
+
 }
 
 function testCloseHander() {
@@ -104,10 +105,62 @@ function testNavigationHandler() {
       'target': {'url': 'https://www.google.com'}
   });
   
-  
 }
 
-testGetRoot();
-testOpenHandler();
-testVisited();
-testNavigationHandler();
+function sleep(milliseconds) {
+	var start = new Date().getTime();
+	while(true) {
+		if((new Date().getTime() - start) >= milliseconds) {
+			break;
+		}
+	}
+}
+
+function testDurationCalculations() {
+  // reset sessions list
+  sessions = [];
+
+  eventOne = {
+      'target': {'url': 'https://www.google.com'}
+  };
+
+	navigationHandler(eventOne, 0);
+
+	assert(sessions[0].tab === 0, 'Tab not correctly defined');
+	assert(currentIndex === 0, 'Current index incorrectly defined');
+	assert(sessions[0].sessionDuration === 0, 'Session duration beginning at ' + sessions[0].duration + ' instead of 0');
+
+	sleep(1000);
+	deactivationHandler();
+
+	assert(sessions[0].sessionDuration === 1000, 'Session duration misscalculated');
+
+	eventTwo = {
+			'target': {'url': 'https://www.facebook.com'}
+	};
+
+	openHandler(eventTwo, 1);
+
+	assert(sessions[1].tab === 1, 'Tab not correctly defined');
+	assert(currentIndex === 1, 'Current index incorrectly defined');
+	assert(sessions[1].sessionDuration === 0, 'Session duration beginning at ' + sessions[0].duration + ' instead of 0');
+
+	sleep(1000);
+	deactivationHandler();
+	activationHandler(null, 0);
+	
+	assert(currentIndex === 0, 'Current index incorrectly defined');
+	assert(sessions[0].sessionDuration === 1000, 'Session 0 duration misscalculated');
+	assert(sessions[1].sessionDuration === 1000, 'Session 1 duration misscalculated');
+
+  // reset sessions list
+  sessions = [];
+}
+
+function runTests() {
+	testDurationCalculations();
+	testGetRoot();
+	testOpenHandler();
+	testVisited();
+	testNavigationHandler();
+}

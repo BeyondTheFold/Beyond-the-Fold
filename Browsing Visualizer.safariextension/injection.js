@@ -1,6 +1,7 @@
+
 function handleLinkClick() {
 	console.log('Child link followed');
-  safari.self.tab.dispatchMessage('child_link_followed');
+  safari.self.tab.dispatchMessage('child_link_followed', window.location.hostname);
 }
 
 function addLinkListeners() {

@@ -18,6 +18,7 @@
 	'previous': false,
 }]
 
+# Implementation
 
 [x] handle child session detection
 	[x] in the injected script we need to create a onclick
@@ -37,9 +38,14 @@
 [x] handle forward button navigation
 [ ] handle export of objects
   - HTML5 local storage in JSON format
-[ ] write test cases
 [ ] parse Google url's for child URL visit detection
 [ ] detect innactive periods when user has left the browser
   [ ] threshold of time sense scrolled or mouse movement
   [ ] consider if a user is watching a video
     [ ] fullscreenchange event when a full screen is enabled/disabled
+[x] implement logic to detect sub-domains
+
+# Testing
+
+[ ] write test cases
+[ ] add tolerences to timing tests
