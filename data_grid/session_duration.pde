@@ -4,7 +4,7 @@ void sessionDuration() {
   stroke(0, 153, 255);
   
   //cooked sessions data
-  int[] sessions = {120,40,29,98,46,10,25,64};
+  int[] sessions = {120,40,29,98,46,10,25,14,300};
   int sessionStart = 0;
   int sessionEnd = 0;
   
