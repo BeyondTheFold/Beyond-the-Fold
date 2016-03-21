@@ -1,9 +1,15 @@
 public class Slice {
   ArrayList<Tab> tabs;
+  Integer duration;
+  
+  Slice() {
+    this.duration = 0;
+    this.tabs = new ArrayList<Tab>();
+  }
   
   void drawSlice(Integer subLevelCount, Integer superLevelCount, Float levelsStartDiameter) {
     this.drawGrid(subLevelCount, superLevelCount, levelsStartDiameter);
-    //this.drawTabs();
+    this.drawTabs();
   }
   
   void drawGrid(Integer subLevelCount, Integer superLevelCount, Float levelsStartDiameter){
@@ -53,10 +59,36 @@ public class Slice {
     line(xin, yin, xout, yout);
   }
   
+  void addTab(Tab tab) {
+    this.tabs.add(tab);
+    this.duration += tab.getDuration();
+  }
+  
+  void generateRandom() {
+    Random generator = new Random();
+
+    //Integer randomTabCount = generator.nextInt(3) + 1;
+    Integer randomTabCount = 1;
+    
+    for(Integer i = 0; i < randomTabCount; ++i) {
+      Tab tab = new Tab();
+      tab.generateRandom();
+      
+      this.addTab(tab);
+    }
+  }
+  
   void drawTabs() {
+    float startAngle = 0;
+    float endAngle;
+    
     // sort tabs from first accessed to last accessed
     for(Integer i = 0; i < tabs.size(); ++i) {
-       
+       endAngle = startAngle + (((float)tabs.get(i).getDuration() / (12 * 60)) * 360);
+       tabs.get(i).setStartAngle(startAngle);
+       tabs.get(i).setEndAngle(endAngle);
+       tabs.get(i).drawTab();
+       startAngle += endAngle;
     }
   }
 }

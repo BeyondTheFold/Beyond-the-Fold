@@ -9,6 +9,7 @@ public class Node {
   Integer duration;
   Boolean subDomain;
   ArrayList<Float> coordinates;
+  Float angle;
  
   Node() {
     this.children = new ArrayList<Node>();
@@ -65,5 +66,17 @@ public class Node {
 
   ArrayList<Float> getCoordinates() {
     return(this.coordinates);
+  }
+  
+  void setAngle(Float angle) {
+    this.angle = angle;
+  }
+  
+  Float getAngle() {
+     return(this.angle); 
+  }
+  
+  void setDuration(Integer duration) {
+    this.duration = duration;
   }
 }

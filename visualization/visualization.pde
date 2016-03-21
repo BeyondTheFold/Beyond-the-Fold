@@ -18,12 +18,12 @@ ArrayList<Float> getCartesian(Float radius, Float angle) {
   return coordinates;
 }
 
-Integer totalDiameter = 800;
+Float totalDiameter = 800.0;
 Float angle = 0.0;
 Integer sliceDuration = 12;
 Float sliceStartAngle = radians(0.0);
 Float levelsStartDiameter = 200.0;
-Integer subLevelCount = 10;
+Integer subLevelCount = 20;
 Float levelSeparation = (totalDiameter - levelsStartDiameter) / subLevelCount;
 
 String getSessionsFromDatabase() {
@@ -152,118 +152,7 @@ void testDrawLinearGraph() {
     testGraph.addNode(node);
   }
   
-  testGraph.drawGraph(0.0, 45.0, levelSeparation);
-}
-
-Integer nodeCount = 0;
-
-void createRandomSubgraph(Graph graph, 
-                        Random generator,
-                        Integer maxDepth, 
-                        Integer depth,
-                        Integer maxChildren,
-                        Node parent
-                        ) {
-                          
-  if(depth >= maxDepth) {
-    return;
-  }
-
-  Integer randomChildCount = generator.nextInt(maxChildren) + 1;
-  Integer takePath;
-
-  for(Integer j = 0; j < randomChildCount; ++j) {
-    Node child = new Node();
-    child.setIndex(nodeCount);
-    ++nodeCount;
-    
-    /*
-    // set node index
-    child.setIndex(nodeNumber);
-    
-    // increment node index counter
-    nodeNumber = nodeNumber + 1;
-    */
-    
-    // randomly decide to take path
-    takePath = generator.nextInt(10);
-   
-    if(takePath >= 3) {
-      // recursively call create random subgraph
-      createRandomSubgraph(graph, generator, maxDepth, depth + 1, maxChildren, child);
-    }
-    
-    child.setParent(parent);
-    parent.addChild(child);
-    
-    graph.addNode(child);
-  } 
-  
-   graph.addNode(parent);
-}
-
-void drawRandomGraph(Integer maxDepth, Integer maxChildren) {
-  Graph testGraph = new Graph();
-
-  Node prevous;
-  Random generator = new Random();
-  Node previous = null;
-  Node next = null;
-  Integer randomPath;
-  Integer randomChildCount;
-  //Integer randomDepth = generator.nextInt(maxDepth) + 1;
-  Integer randomDepth = 10;
-  Integer nodeNumber = 0;
-  Integer depth = 0;
-  
-  previous = new Node();
-  previous.setIndex(nodeCount);
-  ++nodeCount;
-      
-  createRandomSubgraph(testGraph, generator, maxDepth, depth, maxChildren, previous);
-
-
-  /*
-  for(Integer i = 0; i < randomDepth; ++i) {
-    if(previous == null) {
-      previous = new Node();
-      previous.setIndex(nodeNumber);
-      ++nodeNumber;
-    }
-       
-    //randomChildCount = generator.nextInt(maxChildren) + 1;
-    randomChildCount = 4;
-    
-    // pick random path to continue generating subtrees
-    randomPath = generator.nextInt(randomChildCount);
-    
-    for(Integer j = 0; j < randomChildCount; ++j) {
-      Node child = new Node();
-      
-      // set node index
-      child.setIndex(nodeNumber);
-      
-      // increment node index counter
-      ++nodeNumber;
-      
-      child.setParent(previous);
-      previous.addChild(child);
-
-      testGraph.addNode(child);
-      
-      if(j == randomPath) {
-        next = child;
-      }
-    } 
-
-    
-    testGraph.addNode(previous);
-    
-    previous = next;
-  }
-  */
-  
-  testGraph.drawGraph(0.0, 45.0, levelSeparation);
+  testGraph.drawGraph(levelSeparation);
 }
 
 void setup() {
@@ -278,12 +167,8 @@ void setup() {
   //ArrayList<Node> nodeList = importFromCsvFile();
 
   Slice slice = new Slice();
+  slice.generateRandom();
   slice.drawSlice(20, 5, 200.0);
-  //testDrawLinearGraph();
-  drawRandomGraph(10, 2);
-  
-
-
 }
 
 void draw() {
