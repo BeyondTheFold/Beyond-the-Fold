@@ -1,9 +1,17 @@
+class Node { 
+  Node[] children;
+  
+  public Node() {
+     
+  }
+}
+
 enum Shape {
   CIRCLE,
   DIAMOND
 }
 
-ArrayList<Float> getCartesian(float radius, float angle) {
+ArrayList<Float> getCartesian(Float radius, Float angle) {
   ArrayList<Float> coordinates = new ArrayList<Float>(2);
   
   coordinates.add(0, radius * cos(angle));
@@ -29,4 +37,18 @@ void drawNode(float radius, float angle, Shape shape) {
     rect(0, 0, 10, 10);
     popMatrix();
   }
+}
+
+void drawTree(Node root, Float startAngle, Float endAngle, Integer levelCount, Float startDiameter) {
+  float startRadius = startDiameter / 2;
+  float levelSeparation = (totalDiameter - startDiameter / 2) / levelCount;
+  
+
+  int current_level = 0;
+  int level_node_count = 2;
+  float nodeSeparation = endAngle - startAngle / level_node_count;
+  Node current_node = root;
+  //while(current_node.children.length > 0) {
+  drawNode(startRadius + current_level * levelSeparation, startAngle + nodeSeparation, Shape.CIRCLE);
+  //}
 }

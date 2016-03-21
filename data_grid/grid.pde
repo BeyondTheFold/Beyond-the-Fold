@@ -1,20 +1,27 @@
 
 
-void drawGrid(){
+void drawGrid(Integer subLevelCount, Integer superLevelCount, Float levelsStartDiameter){
   noFill();
   stroke(0);
   
   strokeWeight(1.2);
+  
+  float levelSeparation = (totalDiameter - levelsStartDiameter) / subLevelCount;
+  
+  // inner tab ring
   ellipse(0,0,(0.075*totalDiameter),(0.075*totalDiameter));
+  
+  // outer tab ring
   ellipse(0,0,(0.175*totalDiameter),(0.175*totalDiameter));
   
+  
   strokeWeight(0.5);
-  for(float i = (0.2875*totalDiameter); i <= totalDiameter; i += (0.0375*totalDiameter)){
+  for(float i = levelsStartDiameter; i <= totalDiameter; i += levelSeparation){
     ellipse(0,0,i,i);
   }
   
   strokeWeight(1.2);
-  for(float i = (0.4375*totalDiameter); i <= totalDiameter; i += (0.1875*totalDiameter)){
+  for(float i = levelsStartDiameter + levelSeparation * superLevelCount; i <= totalDiameter; i += levelSeparation * superLevelCount){
     ellipse(0,0,i,i);
   }
   
