@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>Builder Version</key>
-	<string>10601.4.4</string>
+	<string>11601.2.7.2</string>
 	<key>CFBundleDisplayName</key>
 	<string>Browsing Visualizer</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.yourcompany.browsingvisualizer</string>
+	<string>browsingvisualizer</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>

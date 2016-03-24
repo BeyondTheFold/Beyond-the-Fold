@@ -59,8 +59,11 @@ function saveSessions() {
   output = [];
   for(var i = 0; i < sessions.length; ++i) {
     var session = sessions[i];
-    
+ 
+		/*   
     output.push({
+			'index': session.index,
+			'tab': session.tab,
       'url': session.url, 
       'sessionStart': session.sessionStart, 
       'sessionDuration': session.sessionDuration, 
@@ -68,6 +71,7 @@ function saveSessions() {
       'withinParentDomain': session.withinParentDomain,
       'child': session.child
     });
+		*/
   }
   
   debugLog('Session saved');
