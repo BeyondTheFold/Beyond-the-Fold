@@ -56,22 +56,20 @@ function calculateDuration(index) {
 }
 
 function saveSessions() {
-  output = [];
+  output = {'sessions': []};
   for(var i = 0; i < sessions.length; ++i) {
     var session = sessions[i];
  
-		/*   
-    output.push({
-			'index': session.index,
+    output.sessions.push({
+			'index': i,
 			'tab': session.tab,
       'url': session.url, 
       'sessionStart': session.sessionStart, 
       'sessionDuration': session.sessionDuration, 
       'parent': session.parent, 
       'withinParentDomain': session.withinParentDomain,
-      'child': session.child
+      'children': session.children
     });
-		*/
   }
   
   debugLog('Session saved');
