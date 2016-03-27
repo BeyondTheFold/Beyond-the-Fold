@@ -1,27 +1,42 @@
 public class Graph {
   ArrayList<ArrayList<Node>> adjacencyList;
+  ArrayList<Integer> levelBreadths;
   ArrayList<Node> nodes;
   Integer duration;
   Integer nodeCount;
-  Float startAngle;
-  Float endAngle;
+  Float startAngle = 0.0;
+  Float endAngle = 90.0;
+  Float levelSeparation;
+  Float sectorLengthSeparation;
+  Float levelsStartDiameter;
   
-  Graph() {
+  Graph(      
+      Float levelSeparation, 
+      Float sectorLengthSeparation, 
+      Float levelsStartDiameter) {
+        
     nodeCount = 0;
+    
+    this.levelSeparation = levelSeparation;
+    this.sectorLengthSeparation = sectorLengthSeparation;
+    this.levelsStartDiameter = levelsStartDiameter;
     
     // initialize duration to 0 microseconds
     this.duration = 0;
         
     // initialize adjacency list
-    adjacencyList = new ArrayList<ArrayList<Node>>(50625);
+    adjacencyList = new ArrayList<ArrayList<Node>>(1024);
     
     // initialize node list
-    nodes = new ArrayList<Node>(50625);
+    nodes = new ArrayList<Node>(1024);
         
-    for(Integer i = 0; i < 50625; ++i) {
+    for(Integer i = 0; i < 1024; ++i) {
      adjacencyList.add(i, null); 
      nodes.add(i, null);
     }
+    
+    //
+    this.levelBreadths = new ArrayList<Integer>();
   }
   
   Integer getDuration() {
@@ -44,21 +59,74 @@ public class Graph {
     }
   }
   
-  void drawGraph(Float levelSeparation) {
+  void drawGraph(Integer minDuration) {
+      Node node;
+      
+      // iterate through all nodes
+      for(Integer i = 0; i < this.nodes.size(); ++i) {
+        node = this.nodes.get(i);
+        
+        // if node exists at position
+        if(node != null) {
+          
+          // dont display nodes with less than minimum duration
+          if(node.getDuration() >= minDuration) {
+            drawNode(node.getCoordinates(), Shape.CIRCLE);
+          }
+        }
+      }
+      
+      // only draw lines on first layer
+      if(minDuration == 0) {
+        this.drawLines();
+      }
+  }
+  
+  void calculateLevelBreadths() {
+    ArrayDeque<Node> queue = new ArrayDeque<Node>();
+    Integer breadth = 0;
+    Integer elementsToDepthIncrease = 1;
+    Integer nextElementsToDepthIncrease = 0;
+    Node current;
+    
+    // node to start with
+    Node start = this.nodes.get(0);
+        
+    // add start node to queue
+    queue.add(start);
+    
+    while(!queue.isEmpty()) {
+      current = queue.poll();
+
+      ++breadth;
+      nextElementsToDepthIncrease += adjacencyList.get(current.getIndex()).size();
+
+      if(--elementsToDepthIncrease == 0) {
+        levelBreadths.add(breadth);
+        breadth = 0;
+        elementsToDepthIncrease = nextElementsToDepthIncrease;
+        nextElementsToDepthIncrease = 0;
+      }      
+      
+      // for each adacent node
+      for(Integer i = 0; i < adjacencyList.get(current.getIndex()).size(); ++i) {
+        Node adjacentNode = adjacencyList.get(current.getIndex()).get(i);
+        queue.add(adjacentNode);
+      }
+    }
+  }
+  
+  void calculateNodePositions() {
     ArrayDeque<Node> queue = new ArrayDeque<Node>();
     Integer depth = 0;
     Integer elementsToDepthIncrease = 1;
     Integer nextElementsToDepthIncrease = 0;
-    Integer breadth = 0;
-    Integer breadthIndex = 0;
     Node current;
-    Float parentAngle = 0.0;
-    Float sectorLengthSeparation = 20.0;
-    Float separationAngle = 10.0;
-    Float graphAngle = (abs(startAngle) - abs(endAngle)) / 2;
-    
-    Float totalAngle = 0.0;
-                       
+    Float separationAngle = 0.0;
+    Float angle;
+    Float parentAngle;
+    Float anchorAngle;
+        
     // node to start with
     Node start = this.nodes.get(0);
         
@@ -70,116 +138,140 @@ public class Graph {
       current = queue.poll();
       
       Float radius = (levelsStartDiameter / 2) + (levelSeparation / 2) * depth;
-  
-      if(depth != 0) {
-        separationAngle = degrees(sectorLengthSeparation / radius);
-      }
-      
-      if(current != null && current.getParent() != null) {
-        parentAngle = current.getParent().getAngle(); 
-      }
-      
-      Float angle = graphAngle + (separationAngle * (elementsToDepthIncrease - 1) - (totalAngle / 2));
-      //Float angle = (separationAngle * (elementsToDepthIncrease - 1));
-            
-      drawNode(radius, angle, Shape.CIRCLE);
+      separationAngle = (endAngle - startAngle) / (levelBreadths.get(depth));
+      angle = startAngle + (separationAngle * (elementsToDepthIncrease - 1)) + (separationAngle / 2);
       
       if(current != null) {
         current.setCoordinates(getCartesian(radius, radians(angle)));
-        current.setAngle(angle);
+        current.setAngle(radians(angle));
+        assert(current.getAngle() == radians(angle));
+        if(current.getParent() != null) {
+          parentAngle = current.getParent().getAngle();
+          anchorAngle = ((radians(angle) - parentAngle) * 0.25);
+          current.setBezierAnchorA(getCartesian(radius, parentAngle + anchorAngle));
+          current.setBezierAnchorB(getCartesian(radius - (levelSeparation / 2), radians(angle) - anchorAngle));
+        } else {
+          current.setBezierAnchorA(getCartesian(radius - (levelSeparation / 2), radians(angle)));
+          current.setBezierAnchorB(getCartesian(radius - (levelSeparation / 2), radians(angle)));
+        }
       }
-      
+            
       nextElementsToDepthIncrease += adjacencyList.get(current.getIndex()).size();
       
       if(--elementsToDepthIncrease == 0) {
         ++depth;
-        totalAngle = (nextElementsToDepthIncrease - 1) * separationAngle;
         elementsToDepthIncrease = nextElementsToDepthIncrease;
         nextElementsToDepthIncrease = 0;
       }
-    
+
       // for each adacent node
       for(Integer i = 0; i < adjacencyList.get(current.getIndex()).size(); ++i) {
         Node adjacentNode = adjacencyList.get(current.getIndex()).get(i);
-        
         queue.add(adjacentNode);
       }
     }
-    
-    this.drawLines();
   }
   
   void drawLines() {
     ArrayList<Float> parentCoordinates;
     ArrayList<Float> childCoordinates;
+    ArrayList<Float> bezierAnchorA;
+    ArrayList<Float> bezierAnchorB;
 
-    for(Integer i = 0; i < nodes.size() - 1; ++i ) {
-      if(adjacencyList.get(i) != null) {
-        parentCoordinates = nodes.get(i).getCoordinates();
+    for(Integer i = 0; i < adjacencyList.size() - 1; ++i ) {
+      if(adjacencyList.get(i) != null) {      
         for(Integer j = 0; j < adjacencyList.get(i).size(); ++j) {
+          parentCoordinates = adjacencyList.get(i).get(j).getParent().getCoordinates();
           childCoordinates = adjacencyList.get(i).get(j).getCoordinates();
+          bezierAnchorA = adjacencyList.get(i).get(j).getBezierAnchorA();
+          bezierAnchorB = adjacencyList.get(i).get(j).getBezierAnchorB();
+
           if(childCoordinates != null && parentCoordinates != null) {
-            strokeWeight(2);
+            strokeWeight(0.75);
             stroke(0);
+            noFill();
             
-            line(parentCoordinates.get(0), parentCoordinates.get(1), childCoordinates.get(0), childCoordinates.get(1)); 
+            bezier(parentCoordinates.get(0), parentCoordinates.get(1), 
+            bezierAnchorA.get(0), bezierAnchorA.get(1),
+            bezierAnchorB.get(0), bezierAnchorB.get(1),
+            childCoordinates.get(0), childCoordinates.get(1)); 
           }
         }
       }
     }
   }
   
-  void createRandomSubgraph(Random generator,
-                        Integer maxDepth, 
-                        Integer depth,
-                        Integer maxChildren,
-                        Node parent
-                        ) {
-                          
+  void createSubgraph(
+    Random generator,
+    Integer maxDepth, 
+    Integer depth,
+    Integer minChildren,
+    Integer maxChildren,
+    Node parent,
+    Integer pathProbability) {
+              
     if(depth >= maxDepth) {
       return;
     }
-  
-    Integer randomChildCount = generator.nextInt(maxChildren) + 1;
+    
+    Integer childCount;
     Integer takePath;
+
+    if(minChildren == maxChildren) {
+      childCount = maxChildren;
+    } else {
+      childCount = generator.nextInt(maxChildren) + minChildren;
+    }
   
-    for(Integer j = 0; j < randomChildCount; ++j) {
+    for(Integer j = 0; j < childCount; ++j) {
       Node child = new Node();
       child.setIndex(nodeCount);
       ++nodeCount;
       
       // generate random node duration
-      child.setDuration(generator.nextInt(10) + 1);
+      child.setDuration(generator.nextInt(10) + 3);
       
       // randomly decide to take path
-      takePath = generator.nextInt(10) + 1;
-  
-      if(takePath >= 4) {
-        // recursively call create random subgraph
-        createRandomSubgraph(generator, maxDepth, depth + 1, maxChildren, child);
-      }
+      takePath = generator.nextInt(100);
       
       child.setParent(parent);
       parent.addChild(child);
       
       this.addNode(child);
+      
+      if(takePath <= pathProbability) {
+        // recursively call create random subgraph
+        createSubgraph(generator, maxDepth, depth + 1, minChildren, maxChildren, child, pathProbability);
+      }
     } 
     
      this.addNode(parent);
   }
 
-  void generateRandom(Integer maxDepth, Integer maxChildren) {
-    Graph testGraph = new Graph();
+  void generateRandom(Integer maxDepth, Integer minChildren, Integer maxChildren) {
   
     Random generator = new Random();
     Integer depth = 0;
-    
+    Integer pathProbability = 50;
     Node root = new Node();
     root.setIndex(nodeCount);
     root.setDuration(0);
     ++nodeCount;
         
-    createRandomSubgraph(generator, maxDepth, depth, maxChildren, root);    
+    createSubgraph(generator, maxDepth, depth, minChildren, maxChildren, root, pathProbability);    
+  }
+  
+  void generateFull(Integer maxDepth, Integer maxChildren) {
+  
+    Random generator = new Random();
+    Integer depth = 0;
+    Integer pathProbability = 100;
+    Node root = new Node();
+    root.setIndex(nodeCount);
+    root.setDuration(0);
+    ++nodeCount;
+        
+    createSubgraph(generator, maxDepth, depth, maxChildren, maxChildren, root, pathProbability);    
   }
   
   void setStartAngle(Float angle) {
@@ -188,5 +280,31 @@ public class Graph {
   
   void setEndAngle(Float angle) {
     this.endAngle = angle; 
+  }
+  
+  Integer getNodeCount() {
+    return(this.nodeCount); 
+  }
+  
+  ArrayList<Node> getNodes() {
+    return(this.nodes); 
+  }
+  
+  void printAdjacencyList() {
+    for(Integer i = 0; i < adjacencyList.size(); ++i) {
+      print(i + " -> ");
+      if(adjacencyList.get(i) != null) {
+        for(Integer j = 0; j < adjacencyList.get(i).size(); ++j) {
+          if(adjacencyList.get(i).get(j) != null) {
+            print(adjacencyList.get(i).get(j).getIndex() + " ");
+          }
+        }
+      }
+      println();
+    }
+  }
+  
+  ArrayList<Integer> getLevelBreadths() {
+    return(this.levelBreadths);
   }
 }

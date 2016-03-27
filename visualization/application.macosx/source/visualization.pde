@@ -12,7 +12,6 @@ Integer click_position_y = 0;
 Float zoom = 0.0;
 Float rotate_x = 0.0;
 Float rotate_y = 0.0;
-Boolean forLaserCutting = true;
 
 enum Shape {
   CIRCLE,
@@ -152,8 +151,8 @@ ArrayList<Node> importFromCsvFile(String filename) {
 }
 
 void drawNode(ArrayList<Float> coordinates, Shape shape) {
-  Float x = coordinates.get(0);
-  Float y = coordinates.get(1);
+  float x = coordinates.get(0);
+  float y = coordinates.get(1);
 
   if(shape == Shape.CIRCLE) {
     fill(0, 0, 0);
@@ -169,10 +168,10 @@ void drawNode(ArrayList<Float> coordinates, Shape shape) {
 }
 
 void drawNode(float radius, float angle, Shape shape) {
-  Float radians = radians(angle);
+  float radians = radians(angle);
   ArrayList<Float> coordinates = getCartesian(radius, radians);
-  Float x = coordinates.get(0);
-  Float y = coordinates.get(1);
+  float x = coordinates.get(0);
+  float y = coordinates.get(1);
 
   if(shape == Shape.CIRCLE) {
     fill(0, 0, 0);
@@ -188,7 +187,7 @@ void drawNode(float radius, float angle, Shape shape) {
 }
 
 void testDrawLinearGraph() {
-  Graph testGraph = new Graph(200.0, 20.0, 5.0);
+  Graph testGraph = new Graph();
   
   for(Integer i = 0; i < 10; ++i) {
     Node node = new Node();
@@ -206,6 +205,8 @@ void testDrawLinearGraph() {
   
   //testGraph.drawGraph(20.0);
 }
+
+Slice slice = new Slice(800.0, 200.0, 20, 5);
 
 void mousePressed() {
   click_position_x = mouseX;
@@ -239,35 +240,28 @@ void mouseWheel(MouseEvent event) {
 }
 
 void setup() {
-  //size(1296, 864, OPENGL);
-  size(1296, 864);
+  size(1296, 864, OPENGL);
   smooth();
   ellipseMode(CENTER);
   rectMode(CENTER);
-  background(255);
+  frameRate(30);
   
   /*
   importFromJsonFile("3-23-16-browsing-history.json");
   //ArrayList<Node> nodeList = importFromCsvFile("3-23-16-browsing-history.csv");
+
+
   */
 
-  translate((width / 2), (height / 2));
-  
-  Slice slice = new Slice(800.0, 200.0, 10, 5);
   slice.generateRandom();
   slice.calculatePositions();
-  slice.drawSlice(0); 
-  
-  //testDrawNode();
-  //testGetCartesian();
-  //testDrawGraph();
 }
 
 void draw() {
-  /*
+  background(255);
   lights();
   
-
+  /*
   pushMatrix();
   rotateX( PI/4 );
   rotateY( radians( frameCount ) );
@@ -280,7 +274,7 @@ void draw() {
   translate((width / 2), (height / 2), -20);
   slice.drawSlice(1); 
   popMatrix();
-  
+  */
   
   pushMatrix();
   //translate((width / 2) + pan_x, (height / 2) + pan_y, zoom);
@@ -292,5 +286,4 @@ void draw() {
   camera((width/2.0) + pan_x, (height/2.0) + pan_y, (height/2.0) / tan(PI*30.0 / 180.0), 
         (width / 2.0) + pan_x, (height/2.0) + pan_y, 0, 
         0, 1, 0);
-  */
 }

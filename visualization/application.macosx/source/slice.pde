@@ -34,14 +34,7 @@ public class Slice {
   
   void drawGrid(){
     noFill();
-    
-    if(forLaserCutting) {
-      // for laser cutting
-      stroke(0);
-    } else {
-      // for visual clearity
-      stroke(170);
-    }
+    stroke(0);
   
     strokeWeight(1.2);
     
@@ -85,13 +78,9 @@ public class Slice {
   }
   
   void addTab(Tab tab) {
-    if(tab.getDuration() + this.duration < 720) {
-      this.tabs.add(tab);
-      this.duration += tab.getDuration();
-      this.nodeCount += tab.getNodeCount();
-    } else {
-      println("warning: tab duration does not fit"); 
-    }
+    this.tabs.add(tab);
+    this.duration += tab.getDuration();
+    this.nodeCount += tab.getNodeCount();
   }
   
   void generateRandom() {
@@ -102,7 +91,7 @@ public class Slice {
     for(Integer i = 0; i < randomTabCount; ++i) {
       Tab tab = new Tab(diameter, levelSeparation, levelStartDiameter);
       tab.generateRandom();
-
+      
       this.addTab(tab);
     }
   }
@@ -110,36 +99,24 @@ public class Slice {
   void calculatePositions() {
     // sort tabs from first accessed to last accessed
     for(Integer i = 0; i < tabs.size(); ++i) {
-      this.endAngle = startAngle + (((float)tabs.get(i).getDuration() / 720) * 360);
-      tabs.get(i).setStartAngle(startAngle);
-      tabs.get(i).setEndAngle(endAngle);
-      tabs.get(i).calculateGraph();
-      this.startAngle = this.endAngle;
+       this.endAngle = startAngle + (((float)tabs.get(i).getDuration() / (12 * 60)) * 360);
+       tabs.get(i).setStartAngle(startAngle);
+       tabs.get(i).setEndAngle(endAngle);
+       this.startAngle = this.endAngle;
     }
-  }
-  
-  void drawDurationArc() {
-    if(forLaserCutting) {
-      // for laser cutting
-      stroke(0);
-    } else {
-      // for visual clearity
-      stroke(0, 153, 255);
-    }
-    
-    noFill();
-    strokeWeight(40);
-    strokeCap(SQUARE);
-    arc(0, 0, 100, 100, 0.0, radians(this.endAngle));
   }
   
   void drawTabs(Integer minDuration) {
     for(Integer i = 0; i < tabs.size(); ++i) {
-      tabs.get(i).drawTab(minDuration);
+       tabs.get(i).drawTab(minDuration);
     }
     
-    drawDurationArc();
-
+    stroke(0, 153, 255);
+    noFill();
+    strokeWeight(40);
+    strokeCap(SQUARE);
+    arc(0, 0, 100, 100, 0.0, radians(this.endAngle));
+    
     for(Integer i = 0; i < tabs.size(); ++i) {
       tabs.get(i).drawTab(minDuration);
     }

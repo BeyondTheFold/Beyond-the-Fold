@@ -1,7 +1,6 @@
 public class Tab {
   ArrayList<Graph> graphs;
   Integer duration;
-  Integer drawnDuration;
   Float startAngle;
   Float endAngle;
   Float levelSeparation;
@@ -34,8 +33,8 @@ public class Tab {
     Integer randomGraphCount = generator.nextInt(5) + 1;
     
     for(Integer i = 0; i < randomGraphCount; ++i) {
-      Graph graph = new Graph(levelSeparation, 20.0, levelStartDiameter);
-      graph.generateRandom(10, 0, 3);
+      Graph graph = new Graph();
+      graph.generateRandom(20, 2);
       
       this.addGraph(graph);
     }
@@ -46,20 +45,19 @@ public class Tab {
     Float graphEndAngle;
     Float graphAngle;
     Float tabAngle = endAngle - startAngle;
-
+    
     // sort tabs from first accessed to last accessed
     for(Integer i = 0; i < graphs.size(); ++i) {
-        graphAngle = tabAngle / graphs.size();
+        graphAngle = (((float)graphs.get(i).getDuration() / this.duration)) * tabAngle;
         graphEndAngle = (float)graphStartAngle + graphAngle;
         graphs.get(i).setStartAngle(graphStartAngle);
         graphs.get(i).setEndAngle(graphEndAngle);
-        graphs.get(i).calculateLevelBreadths();
-        graphs.get(i).calculateNodePositions();
+        graphs.get(i).calculateNodePositions(levelSeparation, 15.0, levelStartDiameter);
         graphStartAngle = graphEndAngle;
     }
   }
   
-  void drawTab(Integer minDuration) {    
+  void drawTab(Integer minDuration) {
     for(Integer i = 0; i < graphs.size(); ++i) {
       this.graphs.get(i).drawGraph(minDuration);
     }
@@ -71,7 +69,7 @@ public class Tab {
   void drawSpoke(Float radius, Float angle) {
     ArrayList<Float> coordinates = getCartesian(radius, radians(angle));
     
-    strokeWeight(.5);
+    strokeWeight(3);
     stroke(0);
     line(0.0, 0.0, coordinates.get(0), coordinates.get(1));
   }
