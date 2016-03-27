@@ -1,7 +1,7 @@
 console.log('Monitor Starting');
 
 // debug flag
-var debug = false;
+var debug = true;
 
 // array to hold all session node objects
 var sessions = [];
@@ -210,6 +210,30 @@ function visited(url) {
   return(null);
 }
 
+function handleNavigationToChild() {
+      debugLog('Visited child URL');
+      
+      // set new node's parent to previous index
+      sessions[currentIndex].parent = previousIndex;
+
+      var childHref = getLocation(sessions[currentIndex].url);
+      var parentHref = getLocation(sessions[previousIndex].url);
+
+      if(childHref.hostname === parentHref.hostname) {
+        sessions[currentIndex].withinParentDomain = true;
+      }
+
+      // push child index onto parent child array
+      sessions[previousIndex].children.push(currentIndex);
+  
+      // de-activate parent
+      sessions[previousIndex].active = false;
+  
+      // reset flags
+      childLinkFollowed = false;
+      childWithinDomain = false;
+}
+
 function navigationHandler(navigationEvent, tab) {
   debugLog('Navigation');
 
@@ -268,27 +292,7 @@ function navigationHandler(navigationEvent, tab) {
     }
   
     if(childLinkFollowed) {
-      debugLog('Visited child URL');
-      
-      // set new node's parent to previous index
-      sessions[currentIndex].parent = previousIndex;
-
-      var childHref = getLocation(sessions[currentIndex].url);
-      var parentHref = getLocation(sessions[previousIndex].url);
-
-      if(childHref.hostname === parentHref.hostname) {
-        sessions[currentIndex].withinParentDomain = true;
-      }
-
-      // push child index onto parent child array
-      sessions[previousIndex].children.push(currentIndex);
-  
-      // de-activate parent
-      sessions[previousIndex].active = false;
-  
-      // reset flags
-      childLinkFollowed = false;
-      childWithinDomain = false;
+			handleNavigationToChild();
     }
   }
   
