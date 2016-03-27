@@ -1,5 +1,3 @@
-console.log('Monitor Starting');
-
 // debug flag
 var debug = true;
 
@@ -72,7 +70,6 @@ function saveSessions() {
   
   debugLog('Session saved');
   localStorage.setItem('sessions', JSON.stringify(output));
-  console.log(localStorage.getItem('sessions'));
 }
 
 function getRoot(sessions, index) {
@@ -96,7 +93,7 @@ function getRoot(sessions, index) {
 		++iterationCount;
     i = sessions[i].parent;
 		if(i === null) {
-			return(-1);
+			return(0);
 		}
   }
   return(i);
@@ -210,18 +207,55 @@ function visited(url) {
   return(null);
 }
 
+function naiveStringMatch(a, b) {
+	var n = a.length;
+	var m = b.length;
+	for(var i = 0; i <= n - m; ++i) {
+		var j = 0;
+		while(j <= m && a[i + j] === b[j]) {
+			++j;
+			if(j >= m) {
+				return(true);
+			}
+		}
+	}
+
+	return(false);
+}
+
+function withinDomain() {
+	var childHref = getLocation(sessions[currentIndex].url);
+	var parentHref = getLocation(sessions[previousIndex].url);
+
+	var i;
+	for(i = 0; i < childHref.hostname.length; ++i) {
+		if(childHref.hostname[i] === '.') {
+			break;
+		}
+	}
+	
+	var childHost = childHref.hostname.substring(i + 1, childHref.hostname.length - 4);
+
+	if(naiveStringMatch(parentHref.hostname, childHost)) {
+		debugLog("Pattern " + childHost + " matched in parent hostname " + parentHref.hostname);
+		return(true);
+	} 
+	
+	debugLog("Pattern " + childHost + " not matched in parent hostname " + parentHref.hostname);
+
+	return(false);
+}
+
 function handleNavigationToChild() {
       debugLog('Visited child URL');
       
       // set new node's parent to previous index
       sessions[currentIndex].parent = previousIndex;
 
-      var childHref = getLocation(sessions[currentIndex].url);
-      var parentHref = getLocation(sessions[previousIndex].url);
-
-      if(childHref.hostname === parentHref.hostname) {
-        sessions[currentIndex].withinParentDomain = true;
-      }
+			// detect if navigated to child is within parent's domain
+			if(withinDomain()) {
+				sessions[currentIndex].withinParentDomain = true;
+			}
 
       // push child index onto parent child array
       sessions[previousIndex].children.push(currentIndex);

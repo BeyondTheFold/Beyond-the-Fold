@@ -157,10 +157,16 @@ function testDurationCalculations() {
   sessions = [];
 }
 
+function testNaiveStringSimilarity() {
+}
+
 function runTests() {
 	testDurationCalculations();
 	testGetRoot();
 	testOpenHandler();
 	testVisited();
 	testNavigationHandler();
+  testNaiveStringSimilarity();
 }
+
+testNaiveStringSimilarity();
