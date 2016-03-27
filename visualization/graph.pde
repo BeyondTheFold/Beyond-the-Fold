@@ -61,6 +61,7 @@ public class Graph {
   
   void drawGraph(Integer minDuration) {
       Node node;
+      Shape shape;
       
       // iterate through all nodes
       for(Integer i = 0; i < this.nodes.size(); ++i) {
@@ -71,7 +72,16 @@ public class Graph {
           
           // dont display nodes with less than minimum duration
           if(node.getDuration() >= minDuration) {
-            drawNode(node.getCoordinates(), Shape.CIRCLE);
+          
+            // if node is is a sub-domain draw circle, otherwise draw diamond
+            if(node.isSubDomain()) {
+              shape = Shape.CIRCLE;
+            } else {
+              shape = Shape.DIAMOND;
+            }
+            
+            fill(0);
+            drawNode(node.getCoordinates(), shape);
           }
         }
       }

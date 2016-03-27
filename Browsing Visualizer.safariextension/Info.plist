@@ -33,13 +33,23 @@
 		<array>
 			<dict>
 				<key>Identifier</key>
-				<string>button</string>
+				<string>save</string>
 				<key>Image</key>
-				<string>button.png</string>
+				<string>save.png</string>
 				<key>Include By Default</key>
 				<true/>
 				<key>Label</key>
-				<string>Button</string>
+				<string>Save</string>
+			</dict>
+			<dict>
+				<key>Identifier</key>
+				<string>clear</string>
+				<key>Image</key>
+				<string>clear.png</string>
+				<key>Include By Default</key>
+				<true/>
+				<key>Label</key>
+				<string>Clear</string>
 			</dict>
 		</array>
 	</dict>

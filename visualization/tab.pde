@@ -9,6 +9,10 @@ public class Tab {
   Float diameter;
   Integer nodeCount;
   
+  Tab() {
+    this.graphs = new ArrayList<Graph>();
+  }
+  
   Tab(Float diameter, Float levelSeparation, Float levelStartDiameter) {
     this.nodeCount = 0;
     this.diameter = diameter;

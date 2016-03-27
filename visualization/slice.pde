@@ -149,4 +149,8 @@ public class Slice {
     println("Total nodes: " + this.nodeCount);
     println("Total duration: " + this.duration / 60 + " minutes"); 
   }
+  
+  void addTabs(ArrayList<Tab> tabs) {
+    this.tabs = tabs;
+  }
 }

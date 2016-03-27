@@ -8,6 +8,9 @@ var sessions = [];
 var childLinkFollowed = false;
 var childWithinDomain = false;
 
+// tab count
+var tabCount = 0;
+
 // previous session index visited on tree
 var previousIndex = null;
 
@@ -35,7 +38,7 @@ var getLocation = function(url) {
   return(result);
 }
 
-function createNode(parent, children, current, previous, url, withinParentDomain, tab) {
+function createNode(parent, children, current, previous, url, withinParentDomain) {
   return({
     'url': url,
     'sessionStart': new Date(),
@@ -49,7 +52,22 @@ function createNode(parent, children, current, previous, url, withinParentDomain
 }
 
 function calculateDuration(index) {
-  sessions[index].sessionDuration += new Date() - sessions[index].sessionStart;
+	if(index !== -1 && index !== null) {
+		sessions[index].sessionDuration += new Date() - sessions[index].sessionStart;
+	}
+}
+
+function handleCommand(event) {
+	if(event.command == 'save') {
+		saveSessions();
+	} else if(event.command == 'clear') {
+		sessions = [];
+		tabCount = 0;
+		currentIndex = null;
+		previousIndex = null;
+		localStorage.removeItem('sessions');
+		debugLog('Cleared sessions');
+	}
 }
 
 function saveSessions() {
@@ -60,6 +78,7 @@ function saveSessions() {
     output.sessions.push({
 			'index': i,
       'url': session.url, 
+			'tab': session.tab,
       'sessionStart': session.sessionStart, 
       'sessionDuration': session.sessionDuration, 
       'parent': session.parent, 
@@ -70,6 +89,7 @@ function saveSessions() {
   
   debugLog('Session saved');
   localStorage.setItem('sessions', JSON.stringify(output));
+	debugLog(JSON.stringify(output));
 }
 
 function getRoot(sessions, index) {
@@ -99,22 +119,6 @@ function getRoot(sessions, index) {
   return(i);
 }
 
-function getCurrentIndex(tab) {
-  debugLog('Searching for current tab');
-  
-  if(tab !== null && typeof tab !== undefined) {
-    for(var i = 0; i < sessions.length; ++i) {
-      if(sessions[i].tab === tab && sessions[i].current === true) {
-        debugLog('Found current node at ' + String(i));
-        
-        return(i);
-      }
-    }
-  }
-
-  return(null);
-}
-
 function getPreviousIndex() {
   debugLog('Searching for previous tab');
 
@@ -128,11 +132,15 @@ function getPreviousIndex() {
   return(null);
 }
 
-function openHandler(openEvent, tab) {
+function openHandler(openEvent) {
   debugLog("Tab/Page Open");
+
+	// increment tab count
+	++tabCount;
 
   // when new tab or window is opened push parent object
   sessions.push({
+		'tab': tabCount,
     'url': openEvent.target.url,
     'sessionStart': new Date(),
     'sessionDuration': 0,
@@ -145,11 +153,6 @@ function openHandler(openEvent, tab) {
 
   previousIndex = null;
   currentIndex = sessions.length - 1;
-
-  // for testing purposes
-  if(tab !== null && typeof tab !== undefined) {
-    sessions[currentIndex].tab = tab;
-  }
 }
 
 function closeHandler(closeEvent) {
@@ -158,16 +161,8 @@ function closeHandler(closeEvent) {
   saveSessions();
 }
 
-function activationHandler(activationEvent, tab) {
+function activationHandler(activationEvent) {
   debugLog("Tab/Page Activation");
-
-  // get current active session index for tab
-  if(tab === null || typeof tab === undefined) {
-    currentIndex = getCurrentIndex(activationEvent.target);
-  } else {
-    // for testing purposes
-    currentIndex = getCurrentIndex(tab);
-   }
 
   // get previously active session index in tab
   previousIndex = getPreviousIndex();
@@ -294,6 +289,7 @@ function navigationHandler(navigationEvent, tab) {
     // create new session object
     sessions.push({
       'url': navigationEvent.target.url,
+			'tab': tabCount,
       'sessionStart': new Date(),
       'sessionDuration': 0,
       'parent': -1,
@@ -307,11 +303,6 @@ function navigationHandler(navigationEvent, tab) {
     previousIndex = currentIndex;
     currentIndex = sessions.length - 1;
 
-    // for testing purposes
-    if(tab !== null && typeof tab !== undefined) {
-      sessions[currentIndex].tab = tab;
-    }
-  
     // set parent current flag to false
     sessions[currentIndex].current = true;
    
@@ -321,6 +312,7 @@ function navigationHandler(navigationEvent, tab) {
     if(previousIndex !== null) {
       // set parent to previously visited index
       sessions[currentIndex].parent = previousIndex;
+			sessions[currentIndex].tab = sessions[previousIndex].tab;
       sessions[previousIndex].current = false;
       sessions[previousIndex].previous = true;
     }
@@ -344,6 +336,7 @@ function beforeSearchHandler(beforeSearchEvent) {
 
   sessions.push({
     'url': beforeSearchEvent.target.url,
+		'tab': tabCount,
     'sessionStart': new Date(),
     'sessionDuration': 0,
     'parent': rootIndex,
@@ -354,6 +347,10 @@ function beforeSearchHandler(beforeSearchEvent) {
 
   previousIndex = rootIndex;
   currentIndex = sessions.length - 1;
+
+	if(previousIndex !== -1 || previousIndex !== null) {
+		sessions[currentIndex].tab = sessions[previousIndex].tab;
+	}
 }
 
 function messageHandler(message) {
@@ -373,4 +370,4 @@ safari.application.addEventListener("deactivate", deactivationHandler, true);
 safari.application.addEventListener("navigate", navigationHandler, true);
 safari.application.addEventListener("beforeNavigate", beforeNavigationHandler, true);
 safari.application.addEventListener("beforeSearch", beforeSearchHandler, true);
-safari.application.addEventListener('command', saveSessions, false);
+safari.application.addEventListener('command', handleCommand, false);

@@ -95,16 +95,18 @@ String getSessionsFromDatabase() {
   return(sessions);
 }
 
-void constructFromJSON(JSONObject json) {
+Slice constructFromJSON(JSONObject json) {
   JSONArray values = json.getJSONArray("sessions");
 
   Integer index;
+  Integer tab;
   String url;
   String sessionStartString;
   Date sessionStart;
   Integer duration;
   Integer parent = 0;
   String current_key;
+  Boolean subDomain;
   
   ArrayList<Node> nodes = new ArrayList<Node>();
   JSONObject session;
@@ -120,42 +122,52 @@ void constructFromJSON(JSONObject json) {
     duration = (duration / 1000) / 60;
     parent = session.getInt("parent");
     childrenArray = session.getJSONArray("children");
+    subDomain = session.getBoolean("withinParentDomain");
+    tab = session.getInt("tab");
+
     ArrayList<Integer> children = new ArrayList<Integer>();
     
     for(int j = 0; j < childrenArray.size(); ++j) {
       children.add(childrenArray.getInt(j));
     }
 
+    // create table of nodes at their respective indicies
     nodes.ensureCapacity(index + 1);
     while(nodes.size() < index + 1) {
       nodes.add(new Node());
     }
     
     Node node = new Node(index, parent, sessionStart, duration, false);
+    node.setTabIndex(tab);
     node.setChildIndicies(children);
+    node.setSubDomain(subDomain);
     nodes.set(index, node);
   }
   
+  Slice slice = new Slice(800.0, 200.0, 10, 5);
+  ArrayList<Tab> tabs = new ArrayList<Tab>();
   ArrayList<Graph> graphs = new ArrayList<Graph>();
+  Integer tabIndex;
   
   // for all nodes without parents
   for(Integer i = 0; i < nodes.size(); ++i) {
     if(nodes.get(i).getIndex() != null && nodes.get(i).getParentIndex() == -1) {
       Graph graph = new Graph(100.0, 20.0, 200.0);
       graph.constructGraph(nodes, nodes.get(i));
-      graphs.add(graph);
+
+      // insure tabs list has capcity for tab at index
+      tabIndex = nodes.get(i).getTabIndex();
+      tabs.ensureCapacity(tabIndex);
+      while(tabs.size() < tabIndex + 1) {
+        tabs.add(new Tab(100.0, 20.0, 200.0));
+      }
+      
+      tabs.get(tabIndex).addGraph(graph);
     }
   }
 
-  for(Integer i = 0; i < graphs.size(); ++i) {
-    graphs.get(i).calculateLevelBreadths();
-    graphs.get(i).calculateNodePositions();
-    graphs.get(i).drawGraph(0);
-
-  }
-  
-  //graphs.get(0).printAdjacencyList();
-  //graphs.get(maxIndex).printAdjacencyList();
+  slice.addTabs(tabs);  
+  return(slice);
 }
 
 Boolean toBoolean(Integer value) {
@@ -255,19 +267,21 @@ JSONObject json;
 void setup() {
   //size(1296, 864, OPENGL);
   size(1296, 864);
-  
-  connectToDatabase();
-  json = loadJSONObject("test_data2.json");
-  //json = loadJSONObject("test_data.json");
+  smooth();
+  ellipseMode(CENTER);
+  rectMode(CENTER);
+  background(255);
+  translate((width / 2), (height / 2));
 
   
-  /*
-  importFromJsonFile("3-23-16-browsing-history.json");
-  //ArrayList<Node> nodeList = importFromCsvFile("3-23-16-browsing-history.csv");
-  */
+  connectToDatabase();
+  json = loadJSONObject("test_data_3.json");
+  Slice slice = constructFromJSON(json);
+  slice.calculatePositions();
+  slice.drawSlice(0);
+
   
   //JSONObject json = parseJSONObject(getSessionsFromDatabase());
-  //println(getSessionsFromDatabase());
 
   /*
   translate((width / 2), (height / 2));
@@ -284,14 +298,10 @@ void setup() {
 }
 
 void draw() {
-  clear();
-  smooth();
-  ellipseMode(CENTER);
-  rectMode(CENTER);
-  background(255);
+
   
   //json = parseJSONObject(getSessionsFromDatabase());
-  constructFromJSON(json);
+
   /*
   lights();
   
@@ -305,7 +315,6 @@ void draw() {
   */
  
   /*   pushMatrix();
-  translate((width / 2), (height / 2), -20);
   slice.drawSlice(1); 
   popMatrix();
   

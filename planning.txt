@@ -1,5 +1,0 @@
-[ ] write method to open localstorage sqlite database and parse out json
-[ ] method to draw grid
-[ ] method to draw root node
-[ ] method to draw child node with connecting edge
-[ ] method to save image

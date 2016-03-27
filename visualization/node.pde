@@ -13,6 +13,7 @@ public class Node {
   ArrayList<Float> bezierAnchorB;
   ArrayList<Integer> childIndicies;
   Float angle;
+  Integer tabIndex;
  
   Node() {
     this.children = new ArrayList<Node>();
@@ -120,5 +121,21 @@ public class Node {
   
   void setChildIndicies(ArrayList<Integer> childIndicies) {
     this.childIndicies = childIndicies;
+  }
+  
+  void setSubDomain(Boolean subDomain) {
+    this.subDomain = subDomain;
+  }
+  
+  Boolean isSubDomain() {
+    return(this.subDomain); 
+  }
+  
+  void setTabIndex(Integer index) {
+    this.tabIndex = index;
+  }
+  
+  Integer getTabIndex() {
+    return(this.tabIndex); 
   }
 }
