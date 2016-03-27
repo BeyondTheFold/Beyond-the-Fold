@@ -39,7 +39,6 @@ var getLocation = function(url) {
 
 function createNode(parent, children, current, previous, url, withinParentDomain, tab) {
   return({
-    'tab': tab,
     'url': url,
     'sessionStart': new Date(),
     'sessionDuration': 0,
@@ -62,7 +61,6 @@ function saveSessions() {
  
     output.sessions.push({
 			'index': i,
-			'tab': session.tab,
       'url': session.url, 
       'sessionStart': session.sessionStart, 
       'sessionDuration': session.sessionDuration, 
@@ -78,20 +76,28 @@ function saveSessions() {
 }
 
 function getRoot(sessions, index) {
-  if(index === null || typeof index === undefined) {
+  if(index === -1 || 
+			index === null || 
+			typeof sessions === undefined || 
+			typeof index === undefined ||
+			sessions[index] === null ||
+			typeof sessions[index] === undefined) {
     return(null);
   }
-  
+
   var i = index;
 	var iterationCount = 0;
 	var maxIteration = sessions.length;
-  while(sessions[i].parent !== null && typeof sessions[i].parent !== undefined) {
+	while(typeof sessions[i].parent !== undefined && sessions[i].parent !== -1) {
 		if(iterationCount >= maxIteration) {
 			debugLog('getRoot(...) stuck in cycle at ' + String(i) + ' and ' + String(sessions[i].parent));
 			return(null);
 		}
 		++iterationCount;
     i = sessions[i].parent;
+		if(i === null) {
+			return(-1);
+		}
   }
   return(i);
 }
@@ -130,11 +136,10 @@ function openHandler(openEvent, tab) {
 
   // when new tab or window is opened push parent object
   sessions.push({
-    'tab': openEvent.target,
     'url': openEvent.target.url,
     'sessionStart': new Date(),
     'sessionDuration': 0,
-    'parent': null,
+    'parent': -1,
     'withinParentDomain': false,
     'children': [],
     'current': true,
@@ -230,11 +235,10 @@ function navigationHandler(navigationEvent, tab) {
     
     // create new session object
     sessions.push({
-      'tab': navigationEvent.target,
       'url': navigationEvent.target.url,
       'sessionStart': new Date(),
       'sessionDuration': 0,
-      'parent': null,
+      'parent': -1,
       'withinParentDomain': false,
       'children': [],
       'current': true,
@@ -322,7 +326,7 @@ function messageHandler(message) {
   }
 }
 
-loadSessions();
+//loadSessions();
 safari.application.addEventListener("message", messageHandler, false);
 safari.application.addEventListener("open", openHandler, true);
 safari.application.addEventListener("close", closeHandler, true);

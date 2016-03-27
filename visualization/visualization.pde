@@ -61,69 +61,101 @@ void drawCylinder(Integer sides, Float radius, Float height) {
   endShape(CLOSE);
 }
 
-String getSessionsFromDatabase() {
-  Connection connection = null;
-  Statement statement = null;
-  String sessions;
-  
+Connection connection = null;
+Statement statement = null;
+
+void connectToDatabase() {
   try {
     Class.forName("org.sqlite.JDBC");
-    connection = DriverManager.getConnection("jdbc:sqlite:Library/Safari/LocalStorage/safari-extension_com.yourcompany.browsingvisualizer-0000000000_0.localstorage");
+    connection = DriverManager.getConnection("jdbc:sqlite:Library/Safari/LocalStorage/safari-extension_browsingvisualizer-0000000000_0.localstorage");
   } catch (Exception error) {
     System.err.println(error.getClass().getName() + ": " + error.getMessage());
-    return(null);
   }
   println("Successfully opened database.");
-  
+}
+
+String getSessionsFromDatabase() {
+  String sessions = "";
+ 
   try {
     statement = connection.createStatement();
     ResultSet result = statement.executeQuery("SELECT value FROM ItemTable WHERE key='sessions'");
     byte[] b = result.getBytes("value");
-    sessions = new String(b, StandardCharsets.UTF_8);
+
+    for(byte character : b) {
+      if(character != 0) {
+        sessions += new String(new byte[] { character });
+      }
+    }
   } catch (Exception error) {
     System.err.println(error.getClass().getName() + ": " + error.getMessage());
     return(null);
   }
-  
+
   return(sessions);
 }
 
-ArrayList<Node> importFromJsonFile(String filename) {
-  ArrayList<Node> nodes = new ArrayList<Node>();
-  JSONObject json = loadJSONObject(filename);
+void constructFromJSON(JSONObject json) {
+  JSONArray values = json.getJSONArray("sessions");
 
-  Iterator iterator = json.keys().iterator();
-
+  Integer index;
   String url;
   String sessionStartString;
   Date sessionStart;
   Integer duration;
-  Integer parent;
+  Integer parent = 0;
   String current_key;
   
-  ArrayList<Node> children = new ArrayList<Node>();
-
-  while(iterator.hasNext()) {
-    current_key = (String)iterator.next();
-    url = json.getJSONObject(current_key).getString("url");
-    sessionStartString = json.getJSONObject(current_key).getString("sessionStart");
+  ArrayList<Node> nodes = new ArrayList<Node>();
+  JSONObject session;
+  JSONArray childrenArray;
+  
+  for(Integer i = 0; i < values.size(); ++i) {
+    session = values.getJSONObject(i);
+    index = session.getInt("index");
+    //url = session.getString("url");
+    sessionStartString = session.getString("sessionStart");
     sessionStart = new Date();
-    duration = json.getJSONObject(current_key).getInt("sessionDuration");
-    parent = json.getJSONObject(current_key).getInt("parent");
-    //children = getChildrenFromString(row.getString("Children"));
+    duration = session.getInt("sessionDuration");
+    duration = (duration / 1000) / 60;
+    parent = session.getInt("parent");
+    childrenArray = session.getJSONArray("children");
+    ArrayList<Integer> children = new ArrayList<Integer>();
     
-    Node node = new Node(Integer.parseInt(current_key), parent, url, sessionStart, duration, false);
-    nodes.add(node);
+    for(int j = 0; j < childrenArray.size(); ++j) {
+      children.add(childrenArray.getInt(j));
+    }
+
+    nodes.ensureCapacity(index + 1);
+    while(nodes.size() < index + 1) {
+      nodes.add(new Node());
+    }
+    
+    Node node = new Node(index, parent, sessionStart, duration, false);
+    node.setChildIndicies(children);
+    nodes.set(index, node);
   }
   
-  return(nodes);
-}
-
-ArrayList<Node> getChildrenFromString(String childrenString) {
-  ArrayList<Node> children = new ArrayList<Node>();
-  String[] indicies = childrenString.split(", ");
+  ArrayList<Graph> graphs = new ArrayList<Graph>();
   
-  return(children);
+  // for all nodes without parents
+  for(Integer i = 0; i < nodes.size(); ++i) {
+    if(nodes.get(i).getIndex() != null && nodes.get(i).getParentIndex() == -1) {
+      Graph graph = new Graph(100.0, 20.0, 200.0);
+      graph.constructGraph(nodes, nodes.get(i));
+      graphs.add(graph);
+    }
+  }
+
+  for(Integer i = 0; i < graphs.size(); ++i) {
+    graphs.get(i).calculateLevelBreadths();
+    graphs.get(i).calculateNodePositions();
+    graphs.get(i).drawGraph(0);
+
+  }
+  
+  //graphs.get(0).printAdjacencyList();
+  //graphs.get(maxIndex).printAdjacencyList();
 }
 
 Boolean toBoolean(Integer value) {
@@ -144,7 +176,7 @@ ArrayList<Node> importFromCsvFile(String filename) {
     String children = row.getString("children");
     Boolean subDomain = toBoolean(row.getInt("subDomain"));
     
-    Node node = new Node(index, parent, url, sessionStart, duration, subDomain);
+    Node node = new Node(index, parent, sessionStart, duration, subDomain);
     nodes.add(node);
   }
   
@@ -187,26 +219,6 @@ void drawNode(float radius, float angle, Shape shape) {
   }
 }
 
-void testDrawLinearGraph() {
-  Graph testGraph = new Graph(200.0, 20.0, 5.0);
-  
-  for(Integer i = 0; i < 10; ++i) {
-    Node node = new Node();
-    node.setIndex(i);
-    if(i != 0) {
-      node.setParent(node);
-    }
-    if(i != 9) {
-      Node child = new Node();
-      child.setIndex(i + 1);
-      node.addChild(child);
-    }
-    testGraph.addNode(node);
-  }
-  
-  //testGraph.drawGraph(20.0);
-}
-
 void mousePressed() {
   click_position_x = mouseX;
   click_position_y = mouseY;
@@ -238,19 +250,26 @@ void mouseWheel(MouseEvent event) {
   zoom += (float)event.getCount(); 
 }
 
+JSONObject json;
+
 void setup() {
   //size(1296, 864, OPENGL);
   size(1296, 864);
-  smooth();
-  ellipseMode(CENTER);
-  rectMode(CENTER);
-  background(255);
+  
+  connectToDatabase();
+  json = loadJSONObject("test_data2.json");
+  //json = loadJSONObject("test_data.json");
+
   
   /*
   importFromJsonFile("3-23-16-browsing-history.json");
   //ArrayList<Node> nodeList = importFromCsvFile("3-23-16-browsing-history.csv");
   */
+  
+  //JSONObject json = parseJSONObject(getSessionsFromDatabase());
+  //println(getSessionsFromDatabase());
 
+  /*
   translate((width / 2), (height / 2));
   
   Slice slice = new Slice(800.0, 200.0, 10, 5);
@@ -261,9 +280,18 @@ void setup() {
   //testDrawNode();
   //testGetCartesian();
   //testDrawGraph();
+  */
 }
 
 void draw() {
+  clear();
+  smooth();
+  ellipseMode(CENTER);
+  rectMode(CENTER);
+  background(255);
+  
+  //json = parseJSONObject(getSessionsFromDatabase());
+  constructFromJSON(json);
   /*
   lights();
   

@@ -2,7 +2,6 @@ public class Node {
   Integer index;
   Integer parentIndex;
   Node parent;
-  ArrayList<Integer> childIndicies;
   ArrayList<Node> children;
   Integer childCount;
   String url;
@@ -12,21 +11,25 @@ public class Node {
   ArrayList<Float> coordinates;
   ArrayList<Float> bezierAnchorA;
   ArrayList<Float> bezierAnchorB;
+  ArrayList<Integer> childIndicies;
   Float angle;
  
   Node() {
     this.children = new ArrayList<Node>();
     this.childCount = 0;
+    this.childIndicies = new ArrayList<Integer>();
   }
   
-  public Node(Integer index, Integer parentIndex, String url, Date start, Integer duration, Boolean subDomain) {
+  public Node(Integer index, Integer parentIndex, Date start, Integer duration, Boolean subDomain) {
     this.index = index;
     this.parentIndex = parentIndex;
-    this.url = url;
     this.start = start;
     this.duration = duration;
     this.subDomain = subDomain;
     this.childCount = 0;
+    this.children = new ArrayList<Node>();
+    this.childCount = 0;
+    this.childIndicies = new ArrayList<Integer>();
   }
   
   Integer getDuration() {
@@ -109,5 +112,13 @@ public class Node {
   
   Integer getChildCount() {
     return(this.childCount); 
+  }
+  
+  ArrayList<Integer> getChildIndicies() {
+    return(this.childIndicies);
+  }
+  
+  void setChildIndicies(ArrayList<Integer> childIndicies) {
+    this.childIndicies = childIndicies;
   }
 }

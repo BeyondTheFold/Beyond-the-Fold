@@ -31,8 +31,8 @@ public class Graph {
     nodes = new ArrayList<Node>(1024);
         
     for(Integer i = 0; i < 1024; ++i) {
-     adjacencyList.add(i, null); 
-     nodes.add(i, null);
+     adjacencyList.add(null); 
+     nodes.add(null);
     }
     
     //
@@ -88,9 +88,19 @@ public class Graph {
     Integer elementsToDepthIncrease = 1;
     Integer nextElementsToDepthIncrease = 0;
     Node current;
+    Node start = null;
     
     // node to start with
-    Node start = this.nodes.get(0);
+    for(Integer i = 0; i < this.nodes.size(); ++i) {
+      if(this.nodes.get(i) != null) {
+        start = this.nodes.get(i);
+        break;
+      }
+    }
+    
+    if(start == null) {
+      return;
+    }
         
     // add start node to queue
     queue.add(start);
@@ -126,9 +136,19 @@ public class Graph {
     Float angle;
     Float parentAngle;
     Float anchorAngle;
-        
+    Node start = null;
+    
     // node to start with
-    Node start = this.nodes.get(0);
+    for(Integer i = 0; i < this.nodes.size(); ++i) {
+      if(this.nodes.get(i) != null) {
+        start = this.nodes.get(i);
+        break;
+      }
+    }
+    
+    if(start == null) {
+      return;
+    }
         
     // add start node to queue
     queue.add(start);
@@ -145,7 +165,7 @@ public class Graph {
         current.setCoordinates(getCartesian(radius, radians(angle)));
         current.setAngle(radians(angle));
         assert(current.getAngle() == radians(angle));
-        if(current.getParent() != null) {
+        if(current.getParent() != null && current.getParent().getAngle() != null) {
           parentAngle = current.getParent().getAngle();
           anchorAngle = ((radians(angle) - parentAngle) * 0.25);
           current.setBezierAnchorA(getCartesian(radius, parentAngle + anchorAngle));
@@ -306,5 +326,22 @@ public class Graph {
   
   ArrayList<Integer> getLevelBreadths() {
     return(this.levelBreadths);
+  }
+ 
+  Node constructGraph(ArrayList<Node> nodeTable, Node node) {
+    if(node == null) {
+      return(null);
+    }
+    
+    for(Integer i = 0; i < node.getChildIndicies().size(); ++i) {
+      Node child = constructGraph(nodeTable, nodeTable.get(node.getChildIndicies().get(i)));
+      if(child != null) {
+        child.setParent(node);
+        node.addChild(child);
+      }
+    }
+    
+    this.addNode(node);
+    return(node);
   }
 }
