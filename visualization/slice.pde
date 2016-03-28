@@ -111,8 +111,8 @@ public class Slice {
     // sort tabs from first accessed to last accessed
     for(Integer i = 0; i < tabs.size(); ++i) {
       this.endAngle = startAngle + (((float)tabs.get(i).getDuration() / 720) * 360);
-      tabs.get(i).setStartAngle(startAngle);
-      tabs.get(i).setEndAngle(endAngle);
+      tabs.get(i).setStartAngle(this.startAngle);
+      tabs.get(i).setEndAngle(this.endAngle);
       tabs.get(i).calculateGraph();
       this.startAngle = this.endAngle;
     }
@@ -148,9 +148,5 @@ public class Slice {
   void printInfo() {
     println("Total nodes: " + this.nodeCount);
     println("Total duration: " + this.duration / 60 + " minutes"); 
-  }
-  
-  void addTabs(ArrayList<Tab> tabs) {
-    this.tabs = tabs;
   }
 }

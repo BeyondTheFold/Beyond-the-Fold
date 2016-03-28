@@ -74,6 +74,11 @@ function saveSessions() {
   output = {'sessions': []};
   for(var i = 0; i < sessions.length; ++i) {
     var session = sessions[i];
+
+		// insure root nodes parent's are -1 instead of null
+		if(session.parent === null) {
+			session.parent = -1;
+		}
  
     output.sessions.push({
 			'index': i,
@@ -183,6 +188,10 @@ function beforeNavigationHandler(beforeNavigationEvent) {
 
 function visited(url) {
   debugLog('Searching visited nodes for URL: ' + url);
+
+	if(url === "") {
+		return(null);
+	}
   
   // get root index in current tree
   var rootIndex = getRoot(sessions, currentIndex);
@@ -245,7 +254,11 @@ function handleNavigationToChild() {
       debugLog('Visited child URL');
       
       // set new node's parent to previous index
-      sessions[currentIndex].parent = previousIndex;
+			if(previousIndex == null) {
+				sessions[currentIndex].parent = -1;
+			} else {
+				sessions[currentIndex].parent = previousIndex;
+			}
 
 			// detect if navigated to child is within parent's domain
 			if(withinDomain()) {
@@ -310,6 +323,11 @@ function navigationHandler(navigationEvent, tab) {
     sessions[currentIndex].previous = false;
     
     if(previousIndex !== null) {
+			// patch parent node child if parent was redirect
+			if(sessions[previousIndex].url === "") {
+				sessions[previousIndex].children.push(currentIndex);
+			}
+
       // set parent to previously visited index
       sessions[currentIndex].parent = previousIndex;
 			sessions[currentIndex].tab = sessions[previousIndex].tab;
@@ -321,7 +339,7 @@ function navigationHandler(navigationEvent, tab) {
 			handleNavigationToChild();
     }
   }
-  
+
   debugLog(sessions);
 }
 

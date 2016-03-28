@@ -105,7 +105,6 @@ Slice constructFromJSON(JSONObject json) {
   Date sessionStart;
   Integer duration;
   Integer parent = 0;
-  String current_key;
   Boolean subDomain;
   
   ArrayList<Node> nodes = new ArrayList<Node>();
@@ -120,6 +119,7 @@ Slice constructFromJSON(JSONObject json) {
     sessionStart = new Date();
     duration = session.getInt("sessionDuration");
     duration = (duration / 1000) / 60;
+    duration = 10;
     parent = session.getInt("parent");
     childrenArray = session.getJSONArray("children");
     subDomain = session.getBoolean("withinParentDomain");
@@ -144,7 +144,7 @@ Slice constructFromJSON(JSONObject json) {
     nodes.set(index, node);
   }
   
-  Slice slice = new Slice(800.0, 200.0, 10, 5);
+  Slice slice = new Slice(800.0, 200.0, 20, 5);
   ArrayList<Tab> tabs = new ArrayList<Tab>();
   ArrayList<Graph> graphs = new ArrayList<Graph>();
   Integer tabIndex;
@@ -152,21 +152,34 @@ Slice constructFromJSON(JSONObject json) {
   // for all nodes without parents
   for(Integer i = 0; i < nodes.size(); ++i) {
     if(nodes.get(i).getIndex() != null && nodes.get(i).getParentIndex() == -1) {
-      Graph graph = new Graph(100.0, 20.0, 200.0);
+      println("Constructing graph from JSON");
+      Graph graph = new Graph(30.0, 20.0, 200.0);
       graph.constructGraph(nodes, nodes.get(i));
+     
+       /*
+      if(i == 1) {
+        graph.calculateLevelBreadths();
+        graph.calculateNodePositions();
+        graph.printAdjacencyList();
+        graph.drawGraph(0);
+      }
+      */
 
       // insure tabs list has capcity for tab at index
       tabIndex = nodes.get(i).getTabIndex();
       tabs.ensureCapacity(tabIndex);
       while(tabs.size() < tabIndex + 1) {
-        tabs.add(new Tab(100.0, 20.0, 200.0));
+        tabs.add(new Tab(800.0, 20.0, 200.0));
       }
       
       tabs.get(tabIndex).addGraph(graph);
     }
   }
-
-  slice.addTabs(tabs);  
+  
+  for(Integer i = 0; i < tabs.size(); ++i) {
+    slice.addTab(tabs.get(i));
+  }
+  
   return(slice);
 }
 
@@ -199,14 +212,14 @@ void drawNode(ArrayList<Float> coordinates, Shape shape) {
   Float x = coordinates.get(0);
   Float y = coordinates.get(1);
 
+  fill(0);
+  noStroke();
+
   if(shape == Shape.CIRCLE) {
-    fill(0, 0, 0);
-    noStroke();
     ellipse(x, y, 10, 10);
   } else if(shape == Shape.DIAMOND) {
     pushMatrix();
     translate(x, y);
-    //rotate(radians + PI/4);
     rect(0, 0, 10, 10);
     popMatrix();
   }
@@ -275,11 +288,11 @@ void setup() {
 
   
   connectToDatabase();
-  json = loadJSONObject("test_data_3.json");
+  json = loadJSONObject("test_data_4.json");
   Slice slice = constructFromJSON(json);
   slice.calculatePositions();
+  slice.printInfo();
   slice.drawSlice(0);
-
   
   //JSONObject json = parseJSONObject(getSessionsFromDatabase());
 

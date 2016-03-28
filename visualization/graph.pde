@@ -61,7 +61,7 @@ public class Graph {
   
   void drawGraph(Integer minDuration) {
       Node node;
-      Shape shape;
+      Shape shape = Shape.CIRCLE;
       
       // iterate through all nodes
       for(Integer i = 0; i < this.nodes.size(); ++i) {
@@ -80,7 +80,6 @@ public class Graph {
               shape = Shape.DIAMOND;
             }
             
-            fill(0);
             drawNode(node.getCoordinates(), shape);
           }
         }
@@ -321,7 +320,7 @@ public class Graph {
   }
   
   void printAdjacencyList() {
-    for(Integer i = 0; i < adjacencyList.size(); ++i) {
+    for(Integer i = 0; i < this.nodeCount; ++i) {
       print(i + " -> ");
       if(adjacencyList.get(i) != null) {
         for(Integer j = 0; j < adjacencyList.get(i).size(); ++j) {
@@ -348,6 +347,7 @@ public class Graph {
       if(child != null) {
         child.setParent(node);
         node.addChild(child);
+        ++this.nodeCount;
       }
     }
     
