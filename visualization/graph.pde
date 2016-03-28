@@ -2,7 +2,7 @@ public class Graph {
   ArrayList<ArrayList<Node>> adjacencyList;
   ArrayList<Integer> levelBreadths;
   ArrayList<Node> nodes;
-  Integer duration;
+  Float duration;
   Integer nodeCount;
   Float startAngle = 0.0;
   Float endAngle = 90.0;
@@ -22,7 +22,7 @@ public class Graph {
     this.levelsStartDiameter = levelsStartDiameter;
     
     // initialize duration to 0 microseconds
-    this.duration = 0;
+    this.duration = 0.0;
         
     // initialize adjacency list
     adjacencyList = new ArrayList<ArrayList<Node>>(1024);
@@ -39,7 +39,7 @@ public class Graph {
     this.levelBreadths = new ArrayList<Integer>();
   }
   
-  Integer getDuration() {
+  Float getDuration() {
     return(this.duration);
   }
   
@@ -59,7 +59,7 @@ public class Graph {
     }
   }
   
-  void drawGraph(Integer minDuration) {
+  void drawGraph(Float minDuration) {
       Node node;
       Shape shape = Shape.CIRCLE;
       
@@ -258,7 +258,7 @@ public class Graph {
       ++nodeCount;
       
       // generate random node duration
-      child.setDuration(generator.nextInt(10) + 3);
+      child.setDuration((float)generator.nextInt(10) + 3);
       
       // randomly decide to take path
       takePath = generator.nextInt(100);
@@ -284,7 +284,7 @@ public class Graph {
     Integer pathProbability = 50;
     Node root = new Node();
     root.setIndex(nodeCount);
-    root.setDuration(0);
+    root.setDuration(0.0);
     ++nodeCount;
         
     createSubgraph(generator, maxDepth, depth, minChildren, maxChildren, root, pathProbability);    
@@ -297,7 +297,7 @@ public class Graph {
     Integer pathProbability = 100;
     Node root = new Node();
     root.setIndex(nodeCount);
-    root.setDuration(0);
+    root.setDuration(0.0);
     ++nodeCount;
         
     createSubgraph(generator, maxDepth, depth, maxChildren, maxChildren, root, pathProbability);    

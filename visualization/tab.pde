@@ -1,6 +1,6 @@
 public class Tab {
   ArrayList<Graph> graphs;
-  Integer duration;
+  Float duration;
   Integer drawnDuration;
   Float startAngle;
   Float endAngle;
@@ -18,11 +18,11 @@ public class Tab {
     this.diameter = diameter;
     this.levelSeparation = levelSeparation;
     this.levelStartDiameter = levelStartDiameter;
-    this.duration = 0; 
+    this.duration = 0.0; 
     this.graphs = new ArrayList<Graph>();
   }
   
-  Integer getDuration() {
+  Float getDuration() {
     return(this.duration); 
   }
   
@@ -63,7 +63,7 @@ public class Tab {
     }
   }
   
-  void drawTab(Integer minDuration) {    
+  void drawTab(Float minDuration) {    
     for(Integer i = 0; i < graphs.size(); ++i) {
       this.graphs.get(i).drawGraph(minDuration);
     }

@@ -1,6 +1,6 @@
 public class Slice {
   ArrayList<Tab> tabs;
-  Integer duration;
+  Float duration;
   Float diameter;
   Float levelStartDiameter;
   Integer levelCount;
@@ -19,13 +19,13 @@ public class Slice {
     this.levelCount = levelCount;
     this.superLevelCount = superLevelCount;
     this.levelSeparation = (diameter - levelStartDiameter) / levelCount;
-    this.duration = 0;
+    this.duration = 0.0;
     this.nodeCount = 0;
     this.tabs = new ArrayList<Tab>();
   }
   
-  void drawSlice(Integer minDuration) {
-    if(minDuration == 0) {
+  void drawSlice(Float minDuration) {
+    if(minDuration == 0.0) {
       this.drawGrid();
     }
     
@@ -85,7 +85,7 @@ public class Slice {
   }
   
   void addTab(Tab tab) {
-    if(tab.getDuration() + this.duration < 720) {
+    if(tab.getDuration() + this.duration < 720.0) {
       this.tabs.add(tab);
       this.duration += tab.getDuration();
       this.nodeCount += tab.getNodeCount();
@@ -133,7 +133,7 @@ public class Slice {
     arc(0, 0, 100, 100, 0.0, radians(this.endAngle));
   }
   
-  void drawTabs(Integer minDuration) {
+  void drawTabs(Float minDuration) {
     for(Integer i = 0; i < tabs.size(); ++i) {
       tabs.get(i).drawTab(minDuration);
     }
@@ -147,6 +147,6 @@ public class Slice {
   
   void printInfo() {
     println("Total nodes: " + this.nodeCount);
-    println("Total duration: " + this.duration / 60 + " minutes"); 
+    println("Total duration: " + this.duration / 60 + " hours"); 
   }
 }

@@ -103,7 +103,7 @@ Slice constructFromJSON(JSONObject json) {
   String url;
   String sessionStartString;
   Date sessionStart;
-  Integer duration;
+  Float duration;
   Integer parent = 0;
   Boolean subDomain;
   
@@ -117,9 +117,9 @@ Slice constructFromJSON(JSONObject json) {
     //url = session.getString("url");
     sessionStartString = session.getString("sessionStart");
     sessionStart = new Date();
-    duration = session.getInt("sessionDuration");
+    duration = (float)session.getInt("sessionDuration");
     duration = (duration / 1000) / 60;
-    duration = 10;
+    duration = 20.0;
     parent = session.getInt("parent");
     childrenArray = session.getJSONArray("children");
     subDomain = session.getBoolean("withinParentDomain");
@@ -156,8 +156,8 @@ Slice constructFromJSON(JSONObject json) {
       Graph graph = new Graph(30.0, 20.0, 200.0);
       graph.constructGraph(nodes, nodes.get(i));
      
-       /*
-      if(i == 1) {
+      /*
+      if(i == 0) {
         graph.calculateLevelBreadths();
         graph.calculateNodePositions();
         graph.printAdjacencyList();
@@ -196,7 +196,7 @@ ArrayList<Node> importFromCsvFile(String filename) {
     String url = row.getString("url");
     String sessionStartString = row.getString("sessionStart");
     Date sessionStart = new Date();
-    Integer duration = row.getInt("sessionDuration");
+    Float duration = (float)row.getInt("sessionDuration");
     Integer parent = row.getInt("parent");
     String children = row.getString("children");
     Boolean subDomain = toBoolean(row.getInt("subDomain"));
@@ -292,7 +292,7 @@ void setup() {
   Slice slice = constructFromJSON(json);
   slice.calculatePositions();
   slice.printInfo();
-  slice.drawSlice(0);
+  slice.drawSlice(0.0);
   
   //JSONObject json = parseJSONObject(getSessionsFromDatabase());
 

@@ -22,7 +22,7 @@ void testDrawGraph() {
   assert(graph.getNodes().get(0).getAngle() == graph.getNodes().get(0).getChildren().get(0).getParent().getAngle());
   
   graph.calculateNodePositions();
-  graph.drawGraph(0);
+  graph.drawGraph(0.0);
 }
 
 void testGetCartesian() {

@@ -263,6 +263,8 @@ function handleNavigationToChild() {
 			// detect if navigated to child is within parent's domain
 			if(withinDomain()) {
 				sessions[currentIndex].withinParentDomain = true;
+			} else { 
+				sessions[currentIndex].withinParentDomain = false;
 			}
 
       // push child index onto parent child array
@@ -328,8 +330,6 @@ function navigationHandler(navigationEvent, tab) {
 				sessions[previousIndex].children.push(currentIndex);
 			}
 
-      // set parent to previously visited index
-      sessions[currentIndex].parent = previousIndex;
 			sessions[currentIndex].tab = sessions[previousIndex].tab;
       sessions[previousIndex].current = false;
       sessions[previousIndex].previous = true;
