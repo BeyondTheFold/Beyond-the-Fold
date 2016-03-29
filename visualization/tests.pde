@@ -7,7 +7,7 @@ void testDrawNode() {
 }
 
 void testDrawGraph() {
-  Graph graph = new Graph(100.0, 20.0, 200.0);
+  Graph graph = new Graph(100.0, 200.0);
   //graph.generateRandom(5, 2);
   graph.generateFull(3, 3);
   graph.setEndAngle(45.0);

@@ -14,23 +14,26 @@ public class Node {
   ArrayList<Integer> childIndicies;
   Float angle;
   Integer tabIndex;
+  Boolean dontDraw;
  
   Node() {
     this.children = new ArrayList<Node>();
     this.childCount = 0;
     this.childIndicies = new ArrayList<Integer>();
+    this.dontDraw = false;
   }
   
   public Node(Integer index, Integer parentIndex, Date start, Float duration, Boolean subDomain) {
+    // call initialization constructor
+    this();
+    
+    // define attributes
     this.index = index;
     this.parentIndex = parentIndex;
     this.start = start;
     this.duration = duration;
     this.subDomain = subDomain;
     this.childCount = 0;
-    this.children = new ArrayList<Node>();
-    this.childCount = 0;
-    this.childIndicies = new ArrayList<Integer>();
   }
   
   Float getDuration() {
@@ -137,5 +140,13 @@ public class Node {
   
   Integer getTabIndex() {
     return(this.tabIndex); 
+  }
+  
+  void dontDraw() {
+    this.dontDraw = true; 
+  }
+  
+  Boolean notDrawn() {
+    return(this.dontDraw); 
   }
 }

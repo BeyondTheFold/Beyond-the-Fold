@@ -7,19 +7,11 @@ public class Graph {
   Float startAngle = 0.0;
   Float endAngle = 90.0;
   Float levelSeparation;
-  Float sectorLengthSeparation;
   Float levelsStartDiameter;
   
-  Graph(      
-      Float levelSeparation, 
-      Float sectorLengthSeparation, 
-      Float levelsStartDiameter) {
-        
+  Graph() {
+    // initialize node count
     nodeCount = 0;
-    
-    this.levelSeparation = levelSeparation;
-    this.sectorLengthSeparation = sectorLengthSeparation;
-    this.levelsStartDiameter = levelsStartDiameter;
     
     // initialize duration to 0 microseconds
     this.duration = 0.0;
@@ -35,8 +27,20 @@ public class Graph {
      nodes.add(null);
     }
     
-    //
+    // initialize table containing each levels breadth
     this.levelBreadths = new ArrayList<Integer>();
+  }
+  
+  Graph(      
+      Float levelSeparation, 
+      Float levelsStartDiameter) {
+    
+    // call initialization constructor
+    this();
+    
+    // define attributes from paremeters
+    this.levelSeparation = levelSeparation;
+    this.levelsStartDiameter = levelsStartDiameter;
   }
   
   Float getDuration() {
@@ -68,10 +72,17 @@ public class Graph {
         node = this.nodes.get(i);
         
         // if node exists at position
-        if(node != null) {
+        if(node != null && node.getCoordinates() != null) {
           
           // dont display nodes with less than minimum duration
-          if(node.getDuration() >= minDuration) {
+          if(node.getDuration() >= minDuration && !node.notDrawn()) {
+            if(node.getParent() != null) {
+              // dont draw if parent not drawn
+              if(node.getParent().notDrawn()) {
+                node.dontDraw();
+                continue;
+              }
+            }
           
             // if node is is a sub-domain draw circle, otherwise draw diamond
             if(node.isSubDomain()) {
@@ -134,6 +145,7 @@ public class Graph {
       }
     }
   }
+ 
   
   void calculateNodePositions() {
     ArrayDeque<Node> queue = new ArrayDeque<Node>();
@@ -145,7 +157,12 @@ public class Graph {
     Float angle;
     Float parentAngle;
     Float anchorAngle;
+    Float radius;
+    Integer maximumBreadth;
     Node start = null;
+    Integer breadth = 0;
+    Float minimumSeparationAngle;
+    Integer adjust = 0;
     
     // node to start with
     for(Integer i = 0; i < this.nodes.size(); ++i) {
@@ -164,39 +181,92 @@ public class Graph {
     
     // while queue is not empty
     while(!queue.isEmpty()) {
+      // get next node to visit
       current = queue.poll();
       
-      Float radius = (levelsStartDiameter / 2) + (levelSeparation / 2) * depth;
-      separationAngle = (endAngle - startAngle) / (levelBreadths.get(depth));
-      angle = startAngle + (separationAngle * (elementsToDepthIncrease - 1)) + (separationAngle / 2);
+      // increment breadth
+      breadth += 1;
+      
+      // calculate radius component of polar coordinate
+      radius = (levelsStartDiameter / 2) + (levelSeparation / 2) * depth;
+      
+      separationAngle = (endAngle - startAngle) / levelBreadths.get(depth);
+            
+      // calculate angle component of polar coordinate
+      angle = startAngle + (separationAngle * (elementsToDepthIncrease - 1)) + (separationAngle / 2);   
       
       if(current != null) {
         current.setCoordinates(getCartesian(radius, radians(angle)));
         current.setAngle(radians(angle));
-        assert(current.getAngle() == radians(angle));
+        //assert(current.getAngle() == radians(angle));
+        
+        // if node has parent
         if(current.getParent() != null && current.getParent().getAngle() != null) {
           parentAngle = current.getParent().getAngle();
           anchorAngle = ((radians(angle) - parentAngle) * 0.25);
+          
+          // calculate midpoints for bezier anchors
           current.setBezierAnchorA(getCartesian(radius, parentAngle + anchorAngle));
           current.setBezierAnchorB(getCartesian(radius - (levelSeparation / 2), radians(angle) - anchorAngle));
         } else {
           current.setBezierAnchorA(getCartesian(radius - (levelSeparation / 2), radians(angle)));
           current.setBezierAnchorB(getCartesian(radius - (levelSeparation / 2), radians(angle)));
         }
-      }
             
-      nextElementsToDepthIncrease += adjacencyList.get(current.getIndex()).size();
-      
-      if(--elementsToDepthIncrease == 0) {
-        ++depth;
-        elementsToDepthIncrease = nextElementsToDepthIncrease;
-        nextElementsToDepthIncrease = 0;
+        nextElementsToDepthIncrease += adjacencyList.get(current.getIndex()).size();
+            
+        // dont draw nodes greather than maximum depth
+        if(depth > 20) {
+          if(current != null) {
+            current.dontDraw();
+          }
+        }
+            
+        // detects if the current node being visited is on a new level
+        if(--elementsToDepthIncrease == 0) {
+          ++depth;
+          breadth = 0;
+          adjust = 0;
+          elementsToDepthIncrease = nextElementsToDepthIncrease;
+          nextElementsToDepthIncrease = 0;
+        }
+  
+        // for each adacent node
+        for(Integer i = 0; i < adjacencyList.get(current.getIndex()).size(); ++i) {
+          Node adjacentNode = adjacencyList.get(current.getIndex()).get(i);
+          queue.add(adjacentNode);
+        }
       }
+    }
+  }
+  
+  void hideOverlappingNodes() {
+    Node a;
+    Node b;
+    for(Integer i = 0; i < nodes.size(); ++i) {
+      a = nodes.get(i);
+      if(a != null) {
+        for(Integer j = 0; j < nodes.size(); ++j) {
+          if(i != j) {
+            b = nodes.get(j);
 
-      // for each adacent node
-      for(Integer i = 0; i < adjacencyList.get(current.getIndex()).size(); ++i) {
-        Node adjacentNode = adjacencyList.get(current.getIndex()).get(i);
-        queue.add(adjacentNode);
+            if(b != null) {
+              if(distance(a, b) < 10) {
+                
+                // prioritize nodes with children
+                if(a.getChildCount() == 0 && b.getChildCount() > 0) {
+                  if(!a.notDrawn() && !b.notDrawn()) {
+                    a.dontDraw();
+                  }
+                } else {
+                  if(!a.notDrawn() && !b.notDrawn()) {
+                    b.dontDraw();
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -206,24 +276,31 @@ public class Graph {
     ArrayList<Float> childCoordinates;
     ArrayList<Float> bezierAnchorA;
     ArrayList<Float> bezierAnchorB;
+    Node a;
+    Node b;
 
     for(Integer i = 0; i < adjacencyList.size() - 1; ++i ) {
-      if(adjacencyList.get(i) != null) {      
+      if(adjacencyList.get(i) != null) {  
         for(Integer j = 0; j < adjacencyList.get(i).size(); ++j) {
-          parentCoordinates = adjacencyList.get(i).get(j).getParent().getCoordinates();
-          childCoordinates = adjacencyList.get(i).get(j).getCoordinates();
-          bezierAnchorA = adjacencyList.get(i).get(j).getBezierAnchorA();
-          bezierAnchorB = adjacencyList.get(i).get(j).getBezierAnchorB();
-
-          if(childCoordinates != null && parentCoordinates != null) {
-            strokeWeight(0.75);
-            stroke(0);
-            noFill();
-            
-            bezier(parentCoordinates.get(0), parentCoordinates.get(1), 
-            bezierAnchorA.get(0), bezierAnchorA.get(1),
-            bezierAnchorB.get(0), bezierAnchorB.get(1),
-            childCoordinates.get(0), childCoordinates.get(1)); 
+          a = adjacencyList.get(i).get(j).getParent();
+          b = adjacencyList.get(i).get(j);
+          
+          if(!a.dontDraw && !b.dontDraw) {
+            parentCoordinates = a.getCoordinates();
+            childCoordinates = b.getCoordinates();
+            bezierAnchorA = b.getBezierAnchorA();
+            bezierAnchorB = b.getBezierAnchorB();
+  
+            if(childCoordinates != null && parentCoordinates != null) {
+              strokeWeight(0.75);
+              stroke(0);
+              noFill();
+              
+              bezier(parentCoordinates.get(0), parentCoordinates.get(1), 
+              bezierAnchorA.get(0), bezierAnchorA.get(1),
+              bezierAnchorB.get(0), bezierAnchorB.get(1),
+              childCoordinates.get(0), childCoordinates.get(1)); 
+            }
           }
         }
       }
@@ -353,5 +430,13 @@ public class Graph {
     
     this.addNode(node);
     return(node);
+  }
+  
+  void setLevelSeparation(Float levelSeparation) {
+    this.levelSeparation = levelSeparation;
+  }
+  
+  void setLevelsStartDiameter(Float levelsStartDiameter) {
+    this.levelsStartDiameter = levelsStartDiameter;
   }
 }

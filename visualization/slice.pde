@@ -11,7 +11,11 @@ public class Slice {
   Float startAngle;
   Float endAngle;
  
-  Slice(Float diameter, Float levelStartDiameter, Integer levelCount, Integer superLevelCount) {
+  Slice(
+      Float diameter, 
+      Float levelStartDiameter, 
+      Integer levelCount, 
+      Integer superLevelCount) {
     this.startAngle = 0.0;
     this.endAngle = 0.0;
     this.diameter = diameter;
@@ -89,6 +93,9 @@ public class Slice {
       this.tabs.add(tab);
       this.duration += tab.getDuration();
       this.nodeCount += tab.getNodeCount();
+      tab.setDiamerter(this.diameter);
+      tab.setLevelSeparation(this.levelSeparation);
+      tab.setLevelStartDiameter(this.levelStartDiameter);
     } else {
       println("warning: tab duration does not fit"); 
     }
@@ -135,13 +142,13 @@ public class Slice {
   
   void drawTabs(Float minDuration) {
     for(Integer i = 0; i < tabs.size(); ++i) {
-      tabs.get(i).drawTab(minDuration);
+      if(tabs.get(i).getDuration() > 15) {
+        tabs.get(i).drawTab(minDuration);
+      }
     }
     
-    drawDurationArc();
-
-    for(Integer i = 0; i < tabs.size(); ++i) {
-      tabs.get(i).drawTab(minDuration);
+    if(minDuration == 0) {
+      drawDurationArc();
     }
   }
   

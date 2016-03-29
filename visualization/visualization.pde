@@ -13,10 +13,33 @@ Float zoom = 0.0;
 Float rotate_x = 0.0;
 Float rotate_y = 0.0;
 Boolean forLaserCutting = true;
+Connection connection = null;
+Statement statement = null;
+Float minimumSeparation = 15.0;
+Float maximumSeparation;
 
 enum Shape {
   CIRCLE,
   DIAMOND
+}
+
+Float distance(Node a, Node b) {
+  Float ax = a.getCoordinates().get(0);
+  Float ay = a.getCoordinates().get(1);
+  Float bx = b.getCoordinates().get(0);
+  Float by = b.getCoordinates().get(1);
+  return(sqrt(pow(ax - bx, 2) + pow(ay - by, 2)));
+}
+
+ArrayList<Float> getPolar(Float x, Float y) {
+  ArrayList<Float> coordinates = new ArrayList<Float>(2);
+
+  Float radius = sqrt((x * x) + (y * y));
+  Float angle = atan(y / x);
+  coordinates.add(0, radius);
+  coordinates.add(1, angle);
+  
+  return coordinates;
 }
 
 ArrayList<Float> getCartesian(Float radius, Float angle) {
@@ -61,9 +84,6 @@ void drawCylinder(Integer sides, Float radius, Float height) {
   endShape(CLOSE);
 }
 
-Connection connection = null;
-Statement statement = null;
-
 void connectToDatabase() {
   try {
     Class.forName("org.sqlite.JDBC");
@@ -71,7 +91,14 @@ void connectToDatabase() {
   } catch (Exception error) {
     System.err.println(error.getClass().getName() + ": " + error.getMessage());
   }
-  println("Successfully opened database.");
+}
+
+void closeConnection() {
+  try {
+    connection.close();
+  } catch (Exception error) {
+    System.err.println(error.getClass().getName() + ": " + error.getMessage());
+  }
 }
 
 String getSessionsFromDatabase() {
@@ -118,8 +145,8 @@ Slice constructFromJSON(JSONObject json) {
     sessionStartString = session.getString("sessionStart");
     sessionStart = new Date();
     duration = (float)session.getInt("sessionDuration");
-    duration = (duration / 1000) / 60;
-    duration = 20.0;
+    duration = ((duration / 1000) / 60);
+    //duration = 13.0;
     parent = session.getInt("parent");
     childrenArray = session.getJSONArray("children");
     subDomain = session.getBoolean("withinParentDomain");
@@ -144,6 +171,7 @@ Slice constructFromJSON(JSONObject json) {
     nodes.set(index, node);
   }
   
+  // 
   Slice slice = new Slice(800.0, 200.0, 20, 5);
   ArrayList<Tab> tabs = new ArrayList<Tab>();
   ArrayList<Graph> graphs = new ArrayList<Graph>();
@@ -152,24 +180,14 @@ Slice constructFromJSON(JSONObject json) {
   // for all nodes without parents
   for(Integer i = 0; i < nodes.size(); ++i) {
     if(nodes.get(i).getIndex() != null && nodes.get(i).getParentIndex() == -1) {
-      println("Constructing graph from JSON");
-      Graph graph = new Graph(30.0, 20.0, 200.0);
+      Graph graph = new Graph();
       graph.constructGraph(nodes, nodes.get(i));
-     
-      /*
-      if(i == 0) {
-        graph.calculateLevelBreadths();
-        graph.calculateNodePositions();
-        graph.printAdjacencyList();
-        graph.drawGraph(0);
-      }
-      */
 
       // insure tabs list has capcity for tab at index
       tabIndex = nodes.get(i).getTabIndex();
       tabs.ensureCapacity(tabIndex);
       while(tabs.size() < tabIndex + 1) {
-        tabs.add(new Tab(800.0, 20.0, 200.0));
+        tabs.add(new Tab(800.0, 30.0, 200.0));
       }
       
       tabs.get(tabIndex).addGraph(graph);
@@ -211,6 +229,8 @@ ArrayList<Node> importFromCsvFile(String filename) {
 void drawNode(ArrayList<Float> coordinates, Shape shape) {
   Float x = coordinates.get(0);
   Float y = coordinates.get(1);
+  ArrayList<Float> polarCoordinates = getPolar(x, y);
+  Float radians = polarCoordinates.get(1);
 
   fill(0);
   noStroke();
@@ -220,6 +240,7 @@ void drawNode(ArrayList<Float> coordinates, Shape shape) {
   } else if(shape == Shape.DIAMOND) {
     pushMatrix();
     translate(x, y);
+    rotate(radians + PI/4);
     rect(0, 0, 10, 10);
     popMatrix();
   }
@@ -277,24 +298,16 @@ void mouseWheel(MouseEvent event) {
 
 JSONObject json;
 
-void setup() {
+void settings() {
   //size(1296, 864, OPENGL);
   size(1296, 864);
-  smooth();
-  ellipseMode(CENTER);
-  rectMode(CENTER);
-  background(255);
-  translate((width / 2), (height / 2));
+}
 
-  
-  connectToDatabase();
-  json = loadJSONObject("test_data_4.json");
-  Slice slice = constructFromJSON(json);
-  slice.calculatePositions();
-  slice.printInfo();
-  slice.drawSlice(0.0);
-  
-  //JSONObject json = parseJSONObject(getSessionsFromDatabase());
+void setup() {
+
+  // file name to change for test data
+  //json = loadJSONObject("test_data_6.json");
+
 
   /*
   translate((width / 2), (height / 2));
@@ -308,11 +321,27 @@ void setup() {
   //testGetCartesian();
   //testDrawGraph();
   */
+  
 }
 
 void draw() {
-
+  clear();
+  smooth();
+  ellipseMode(CENTER);
+  rectMode(CENTER);
+  background(255);
+  translate((width / 2), (height / 2));
   
+  connectToDatabase();
+  json = parseJSONObject(getSessionsFromDatabase());
+  closeConnection();
+  
+  Slice slice = constructFromJSON(json);
+  slice.calculatePositions();
+  slice.drawSlice(0.0);
+  
+  delay(200);
+
   //json = parseJSONObject(getSessionsFromDatabase());
 
   /*

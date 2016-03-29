@@ -27,6 +27,8 @@ public class Tab {
   }
   
   void addGraph(Graph graph) {
+    graph.setLevelSeparation(levelSeparation);
+    graph.setLevelsStartDiameter(levelStartDiameter);
     this.graphs.add(graph);
     this.duration += graph.getDuration();
     this.nodeCount += graph.getNodeCount();
@@ -38,7 +40,7 @@ public class Tab {
     Integer randomGraphCount = generator.nextInt(5) + 1;
     
     for(Integer i = 0; i < randomGraphCount; ++i) {
-      Graph graph = new Graph(levelSeparation, 20.0, levelStartDiameter);
+      Graph graph = new Graph(levelSeparation, levelStartDiameter);
       graph.generateRandom(10, 0, 3);
       
       this.addGraph(graph);
@@ -59,6 +61,7 @@ public class Tab {
         graphs.get(i).setEndAngle(graphEndAngle);
         graphs.get(i).calculateLevelBreadths();
         graphs.get(i).calculateNodePositions();
+        graphs.get(i).hideOverlappingNodes();
         graphStartAngle = graphEndAngle;
     }
   }
@@ -68,8 +71,10 @@ public class Tab {
       this.graphs.get(i).drawGraph(minDuration);
     }
     
-    drawSpoke(diameter / 2, this.startAngle);
-    drawSpoke(diameter / 2, this.endAngle);
+    if(minDuration == 0) {
+      drawSpoke(diameter / 2, this.startAngle);
+      drawSpoke(diameter / 2, this.endAngle);
+    }
   }
   
   void drawSpoke(Float radius, Float angle) {
@@ -90,5 +95,17 @@ public class Tab {
   
   Integer getNodeCount() {
     return(this.nodeCount); 
+  }
+  
+  void setDiamerter(Float diameter) {
+    this.diameter = diameter;
+  }
+  
+  void setLevelSeparation(Float levelSeparation) {
+    this.levelSeparation = levelSeparation;
+  }
+  
+  void setLevelStartDiameter(Float levelStartDiameter) {
+    this.levelStartDiameter = levelStartDiameter;
   }
 }

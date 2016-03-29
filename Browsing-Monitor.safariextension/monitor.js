@@ -25,7 +25,7 @@ function debugLog(output) {
 
 function loadSessions() {
   debugLog('Loading sessions from local storage');
-  sessions = JSON.parse(localStorage.getItem('sessions'));
+  sessions = JSON.parse(localStorage.sessions);
 
   if(sessions === null) {
     sessions = [];
@@ -65,13 +65,15 @@ function handleCommand(event) {
 		tabCount = 0;
 		currentIndex = null;
 		previousIndex = null;
-		localStorage.removeItem('sessions');
+		localStorage.sessions = '{\'sessions\': []}';
 		debugLog('Cleared sessions');
 	}
 }
 
 function saveSessions() {
   output = {'sessions': []};
+	var data = '';
+
   for(var i = 0; i < sessions.length; ++i) {
     var session = sessions[i];
 
@@ -91,10 +93,12 @@ function saveSessions() {
       'children': session.children
     });
   }
-  
+
+	data = JSON.stringify(output);
+
   debugLog('Session saved');
-  localStorage.setItem('sessions', JSON.stringify(output));
-	debugLog(JSON.stringify(output));
+  localStorage.sessions = data;
+	debugLog(data);
 }
 
 function getRoot(sessions, index) {
@@ -169,8 +173,16 @@ function closeHandler(closeEvent) {
 function activationHandler(activationEvent) {
   debugLog("Tab/Page Activation");
 
+	// MAKE SURE IF THE SAME URL IS OPEN IN TWO TABS IT WILL SET PREVIOUS
+	// AS PROPER PARENT NODE
+	for(var i = 0; i < sessions.length; ++i) {
+		if(sessions[i].url === activationEvent.target.url && sessions[i].current === true) {
+		
+		}
+	}
+
   // get previously active session index in tab
-  previousIndex = getPreviousIndex();
+  //previousIndex = getPreviousIndex();
 }
 
 function deactivationHandler(deactivationEvent) {
@@ -193,17 +205,8 @@ function visited(url) {
 		return(null);
 	}
   
-  // get root index in current tree
-  var rootIndex = getRoot(sessions, currentIndex);
-  
-  if(rootIndex === null || typeof rootIndex === undefined) {
-    debugLog('Root node not found');
-
-    return(null);
-  }
-  
   for(var i = 0; i < sessions.length; ++i) {
-    if(sessions[i].url === url && getRoot(sessions, i) === rootIndex) {
+    if(sessions[i].url === url && sessions[i].tab === sessions[currentIndex].tab) {
       return(i);
     }
   }
@@ -281,6 +284,9 @@ function handleNavigationToChild() {
 function navigationHandler(navigationEvent, tab) {
   debugLog('Navigation');
 
+	// save sessions
+	saveSessions();
+
   // find if navigated to URL has been visited 
   var visitedIndex = visited(navigationEvent.target.url);
 
@@ -328,6 +334,7 @@ function navigationHandler(navigationEvent, tab) {
 			// patch parent node child if parent was redirect
 			if(sessions[previousIndex].url === "") {
 				sessions[previousIndex].children.push(currentIndex);
+				sessions[currentIndex].parent = previousIndex;
 			}
 
 			sessions[currentIndex].tab = sessions[previousIndex].tab;
@@ -360,6 +367,7 @@ function beforeSearchHandler(beforeSearchEvent) {
     'parent': rootIndex,
     'children': [],
     'current': true,
+    'withinParentDomain': false,
     'previous': false
   });
 
