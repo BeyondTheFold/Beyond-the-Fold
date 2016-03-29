@@ -240,37 +240,6 @@ public class Graph {
     }
   }
   
-  void hideOverlappingNodes() {
-    Node a;
-    Node b;
-    for(Integer i = 0; i < nodes.size(); ++i) {
-      a = nodes.get(i);
-      if(a != null) {
-        for(Integer j = 0; j < nodes.size(); ++j) {
-          if(i != j) {
-            b = nodes.get(j);
-
-            if(b != null) {
-              if(distance(a, b) < 10) {
-                
-                // prioritize nodes with children
-                if(a.getChildCount() == 0 && b.getChildCount() > 0) {
-                  if(!a.notDrawn() && !b.notDrawn()) {
-                    a.dontDraw();
-                  }
-                } else {
-                  if(!a.notDrawn() && !b.notDrawn()) {
-                    b.dontDraw();
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  
   void drawLines() {
     ArrayList<Float> parentCoordinates;
     ArrayList<Float> childCoordinates;

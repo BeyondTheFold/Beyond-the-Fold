@@ -10,8 +10,9 @@ Float DIAMETER = 800.0;
 Integer LEVELS = 20;
 Integer SUPER_LEVELS = 5;
 Float START_DIAMTER = 200.0;
-Float TOTAL_SLICE_DURATION = 30.0; // in minutes
+Float TOTAL_SLICE_DURATION = 15.0; // in minutes
 Float LEVEL_SEPARATION = (DIAMETER - START_DIAMTER) / LEVELS;
+Integer MINIMUM_NODE_SEPARATION = 15;
 
 Float pan_x = 0.0;
 Float pan_y = 0.0;
@@ -61,7 +62,7 @@ void hideOverlappingNodes(ArrayList<Node> A, ArrayList<Node> B) {
           b = B.get(j);
 
           if(b != null) {
-            if(distance(a, b) < 10) {
+            if(distance(a, b) < MINIMUM_NODE_SEPARATION) {
               
               // prioritize nodes with children
               if(a.getChildCount() == 0 && b.getChildCount() > 0) {
