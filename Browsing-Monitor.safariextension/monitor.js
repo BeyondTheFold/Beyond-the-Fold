@@ -61,12 +61,14 @@ function handleCommand(event) {
 	if(event.command == 'save') {
 		saveSessions();
 	} else if(event.command == 'clear') {
-		sessions = [];
-		tabCount = 0;
-		currentIndex = null;
-		previousIndex = null;
-		localStorage.sessions = '{\'sessions\': []}';
-		debugLog('Cleared sessions');
+		if(confirm('Are you sure you want to clear all of the sessions?')) {
+			sessions = [];
+			tabCount = 0;
+			currentIndex = null;
+			previousIndex = null;
+			localStorage.sessions = '{\'sessions\': []}';
+			debugLog('Cleared sessions');
+		}
 	}
 }
 
