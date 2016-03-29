@@ -142,7 +142,7 @@ public class Slice {
   
   void drawTabs(Float minDuration) {
     for(Integer i = 0; i < tabs.size(); ++i) {
-      if(tabs.get(i).getDuration() > 15) {
+      if(tabs.get(i).getDuration() > MINIMUM_TAB_DURATION) {
         tabs.get(i).drawTab(minDuration);
       }
     }

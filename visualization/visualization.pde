@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.ArrayList;
 import processing.opengl.*;
 
+Float MINIMUM_TAB_DURATION = 0.0;
 Float pan_x = 0.0;
 Float pan_y = 0.0;
 Integer click_position_x = 0;
