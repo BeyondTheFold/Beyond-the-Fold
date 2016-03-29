@@ -61,8 +61,13 @@ public class Tab {
         graphs.get(i).setEndAngle(graphEndAngle);
         graphs.get(i).calculateLevelBreadths();
         graphs.get(i).calculateNodePositions();
-        graphs.get(i).hideOverlappingNodes();
         graphStartAngle = graphEndAngle;
+    }
+    
+    for(Integer i = 0; i < graphs.size(); ++i) {
+      for(Integer j = 0; j < graphs.size(); ++j) {
+        hideOverlappingNodes(graphs.get(i).getNodes(), graphs.get(j).getNodes());
+      }
     }
   }
   

@@ -10,7 +10,7 @@ Float DIAMETER = 800.0;
 Integer LEVELS = 20;
 Integer SUPER_LEVELS = 5;
 Float START_DIAMTER = 200.0;
-Float TOTAL_SLICE_DURATION = 310.0; // in minutes
+Float TOTAL_SLICE_DURATION = 30.0; // in minutes
 Float LEVEL_SEPARATION = (DIAMETER - START_DIAMTER) / LEVELS;
 
 Float pan_x = 0.0;
@@ -48,6 +48,37 @@ ArrayList<Float> getPolar(Float x, Float y) {
   coordinates.add(1, angle);
   
   return coordinates;
+}
+
+void hideOverlappingNodes(ArrayList<Node> A, ArrayList<Node> B) {
+  Node a;
+  Node b;
+  for(Integer i = 0; i < A.size(); ++i) {
+    a = A.get(i);
+    if(a != null) {
+      for(Integer j = 0; j < B.size(); ++j) {
+        if(i != j) {
+          b = B.get(j);
+
+          if(b != null) {
+            if(distance(a, b) < 10) {
+              
+              // prioritize nodes with children
+              if(a.getChildCount() == 0 && b.getChildCount() > 0) {
+                if(!a.notDrawn() && !b.notDrawn()) {
+                  a.dontDraw();
+                }
+              } else {
+                if(!a.notDrawn() && !b.notDrawn()) {
+                  b.dontDraw();
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 ArrayList<Float> getCartesian(Float radius, Float angle) {
@@ -312,9 +343,8 @@ void settings() {
 }
 
 void setup() {
-
   // file name to change for test data
-  //json = loadJSONObject("test_data_6.json");
+  json = loadJSONObject("test_data_6.json");
 
   /*
   translate((width / 2), (height / 2));
@@ -339,12 +369,13 @@ void draw() {
   background(255);
   translate((width / 2), (height / 2));
   
-  connectToDatabase();
-  json = parseJSONObject(getSessionsFromDatabase());
-  closeConnection();
+  //connectToDatabase();
+  //json = parseJSONObject(getSessionsFromDatabase());
+  //closeConnection();
   
   Slice slice = constructFromJSON(json);
   slice.calculatePositions();
+  slice.printInfo();
   slice.drawSlice(0.0);
   
   delay(200);
