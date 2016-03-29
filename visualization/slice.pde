@@ -147,7 +147,7 @@ public class Slice {
       }
     }
     
-    if(minDuration == 0) {
+    if(minDuration == 0 && this.duration > 0) {
       drawDurationArc();
     }
   }
