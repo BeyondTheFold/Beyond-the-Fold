@@ -89,7 +89,7 @@ public class Slice {
   }
   
   void addTab(Tab tab) {
-    if(tab.getDuration() + this.duration < 720.0) {
+    if(tab.getDuration() + this.duration < TOTAL_SLICE_DURATION) {
       this.tabs.add(tab);
       this.duration += tab.getDuration();
       this.nodeCount += tab.getNodeCount();
@@ -117,7 +117,7 @@ public class Slice {
   void calculatePositions() {
     // sort tabs from first accessed to last accessed
     for(Integer i = 0; i < tabs.size(); ++i) {
-      this.endAngle = startAngle + (((float)tabs.get(i).getDuration() / 720) * 360);
+      this.endAngle = startAngle + (((float)tabs.get(i).getDuration() / TOTAL_SLICE_DURATION) * 360);
       tabs.get(i).setStartAngle(this.startAngle);
       tabs.get(i).setEndAngle(this.endAngle);
       tabs.get(i).calculateGraph();
@@ -147,7 +147,7 @@ public class Slice {
       }
     }
     
-    if(minDuration == 0 && this.duration > 0) {
+    if(minDuration == 0 && this.duration > 3) {
       drawDurationArc();
     }
   }

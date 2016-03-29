@@ -10,6 +10,7 @@ Float DIAMETER = 800.0;
 Integer LEVELS = 20;
 Integer SUPER_LEVELS = 5;
 Float START_DIAMTER = 200.0;
+Float TOTAL_SLICE_DURATION = 310.0; // in minutes
 Float LEVEL_SEPARATION = (DIAMETER - START_DIAMTER) / LEVELS;
 
 Float pan_x = 0.0;
