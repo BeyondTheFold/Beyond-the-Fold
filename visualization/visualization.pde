@@ -5,13 +5,13 @@ import java.util.Date;
 import java.util.ArrayList;
 import processing.opengl.*;
 
-Float MINIMUM_TAB_DURATION = 5.0;
+Float MINIMUM_TAB_DURATION = 0.0;
 Float DIAMETER = 1000.0;
 Integer LEVELS = 20;
 Integer SUPER_LEVELS = 5;
 Float START_DIAMTER = 250.0;
 Float TOTAL_SLICE_DURATION = 360.0; // in minutes
-Float LEVEL_SEPARATION = (DIAMETER - START_DIAMTER) / 21;
+Float LEVEL_SEPARATION = (DIAMETER - START_DIAMTER) / LEVELS;
 Integer MINIMUM_NODE_SEPARATION = 0;
 
 Float pan_x = 0.0;
@@ -186,7 +186,6 @@ Slice constructFromJSON(JSONObject json) {
     sessionStart = new Date();
     duration = (float)session.getInt("sessionDuration");
     duration = ((duration / 1000) / 60);
-    //duration = 13.0;
     parent = session.getInt("parent");
     childrenArray = session.getJSONArray("children");
     subDomain = session.getBoolean("withinParentDomain");

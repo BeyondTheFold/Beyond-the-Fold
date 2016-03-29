@@ -62,7 +62,7 @@ public class Slice {
     }
   
     strokeWeight(1.2);
-    for(float i = levelStartDiameter + levelSeparation * superLevelCount; i <= diameter; i += levelSeparation * superLevelCount){
+    for(float i = levelStartDiameter + levelSeparation * superLevelCount - 1; i <= diameter; i += levelSeparation * superLevelCount){
       ellipse(0,0,i,i);
     }
     
