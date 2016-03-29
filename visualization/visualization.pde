@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import processing.opengl.*;
 
 Float MINIMUM_TAB_DURATION = 0.0;
+Float DIAMETER = 800.0;
+Integer LEVELS = 20;
+Integer SUPER_LEVELS = 5;
+Float START_DIAMTER = 200.0;
+Float LEVEL_SEPARATION = (DIAMETER - START_DIAMTER) / LEVELS;
+
 Float pan_x = 0.0;
 Float pan_y = 0.0;
 Integer click_position_x = 0;
@@ -173,7 +179,7 @@ Slice constructFromJSON(JSONObject json) {
   }
   
   // 
-  Slice slice = new Slice(800.0, 200.0, 20, 5);
+  Slice slice = new Slice(DIAMETER, START_DIAMTER, LEVELS, SUPER_LEVELS);
   ArrayList<Tab> tabs = new ArrayList<Tab>();
   ArrayList<Graph> graphs = new ArrayList<Graph>();
   Integer tabIndex;
@@ -188,7 +194,7 @@ Slice constructFromJSON(JSONObject json) {
       tabIndex = nodes.get(i).getTabIndex();
       tabs.ensureCapacity(tabIndex);
       while(tabs.size() < tabIndex + 1) {
-        tabs.add(new Tab(800.0, 30.0, 200.0));
+        tabs.add(new Tab(DIAMETER, LEVEL_SEPARATION, START_DIAMTER));
       }
       
       tabs.get(tabIndex).addGraph(graph);
@@ -308,7 +314,6 @@ void setup() {
 
   // file name to change for test data
   //json = loadJSONObject("test_data_6.json");
-
 
   /*
   translate((width / 2), (height / 2));
