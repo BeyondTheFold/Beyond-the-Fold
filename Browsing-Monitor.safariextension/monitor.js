@@ -25,7 +25,9 @@ function debugLog(output) {
 
 function loadSessions() {
   debugLog('Loading sessions from local storage');
-  sessions = JSON.parse(localStorage.sessions);
+  sessions = JSON.parse(localStorage.sessions).sessions;
+
+	console.log(sessions);
 
   if(sessions === null) {
     sessions = [];

@@ -50,10 +50,10 @@ public class Slice {
     strokeWeight(1.2);
     
     // inner tab ring
-    ellipse(0,0,(0.075*diameter),(0.075*diameter));
+    ellipse(0,0,(0.075*diameter),(0.075 * diameter));
     
     // outer tab ring
-    ellipse(0,0,(0.175*diameter),(0.175*diameter));
+    ellipse(0,0,(0.175*diameter),(0.175 * diameter));
     
     
     strokeWeight(0.5);
@@ -62,7 +62,7 @@ public class Slice {
     }
   
     strokeWeight(1.2);
-    for(float i = levelStartDiameter + levelSeparation * superLevelCount - 1; i <= diameter; i += levelSeparation * superLevelCount){
+    for(float i = levelStartDiameter + (levelSeparation * superLevelCount); i <= diameter; i += levelSeparation * superLevelCount){
       ellipse(0,0,i,i);
     }
     
@@ -135,9 +135,9 @@ public class Slice {
     }
     
     noFill();
-    strokeWeight(40);
+    strokeWeight(((0.175 * diameter) / 2) - ((0.075 * diameter) / 2));
     strokeCap(SQUARE);
-    arc(0, 0, 100, 100, 0.0, radians(this.endAngle));
+    arc(0, 0, START_DIAMTER / 2, START_DIAMTER / 2, 0.0, radians(this.endAngle));
   }
   
   void drawTabs(Float minDuration) {
