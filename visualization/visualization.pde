@@ -5,14 +5,14 @@ import java.util.Date;
 import java.util.ArrayList;
 import processing.opengl.*;
 
-Float MINIMUM_TAB_DURATION = 0.0;
-Float DIAMETER = 800.0;
+Float MINIMUM_TAB_DURATION = 5.0;
+Float DIAMETER = 1000.0;
 Integer LEVELS = 20;
 Integer SUPER_LEVELS = 5;
-Float START_DIAMTER = 200.0;
-Float TOTAL_SLICE_DURATION = 15.0; // in minutes
-Float LEVEL_SEPARATION = (DIAMETER - START_DIAMTER) / LEVELS;
-Integer MINIMUM_NODE_SEPARATION = 15;
+Float START_DIAMTER = 250.0;
+Float TOTAL_SLICE_DURATION = 360.0; // in minutes
+Float LEVEL_SEPARATION = (DIAMETER - START_DIAMTER) / 21;
+Integer MINIMUM_NODE_SEPARATION = 0;
 
 Float pan_x = 0.0;
 Float pan_y = 0.0;
@@ -345,7 +345,7 @@ void settings() {
 
 void setup() {
   // file name to change for test data
-  json = loadJSONObject("test_data_6.json");
+  json = loadJSONObject("test_data_7.json");
 
   /*
   translate((width / 2), (height / 2));
