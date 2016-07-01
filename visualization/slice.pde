@@ -104,7 +104,7 @@ public class Slice {
   void generateRandom() {
     Random generator = new Random();
 
-    Integer randomTabCount = generator.nextInt(3) + 3;
+    Integer randomTabCount = generator.nextInt(6) + 3;
     
     for(Integer i = 0; i < randomTabCount; ++i) {
       Tab tab = new Tab(diameter, levelSeparation, levelStartDiameter);
@@ -135,7 +135,7 @@ public class Slice {
     }
     
     noFill();
-    strokeWeight(((0.175 * diameter) / 2) - ((0.075 * diameter) / 2));
+    strokeWeight(((0.175 * this.diameter) / 2) - ((0.075 * this.diameter) / 2));
     strokeCap(SQUARE);
     arc(0, 0, START_DIAMTER / 2, START_DIAMTER / 2, 0.0, radians(this.endAngle));
   }
@@ -152,8 +152,14 @@ public class Slice {
     }
   }
   
-  void printInfo() {
-    println("Total nodes: " + this.nodeCount);
-    println("Total duration: " + this.duration / 60 + " hours"); 
+  void drawInfo() {
+    fill(0);
+    PFont avenir = createFont("Avenir", 24);
+    textFont(avenir);
+    pushMatrix();
+    translate(20, height - 50);
+    text("Total nodes: " + this.nodeCount, 0, 0);
+    text("Total duration: " + this.duration / 60 + " hours", 0, 30); 
+    popMatrix();
   }
 }

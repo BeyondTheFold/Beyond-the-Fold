@@ -5,12 +5,12 @@ import java.util.Date;
 import java.util.ArrayList;
 import processing.opengl.*;
 
-Float MINIMUM_TAB_DURATION = 5.0;
+Float MINIMUM_TAB_DURATION = 15.0;
 Float DIAMETER = 800.0;
 Integer LEVELS = 20;
 Integer SUPER_LEVELS = 5;
 Float START_DIAMTER = 200.0;
-Float TOTAL_SLICE_DURATION = 360.0; // in minutes
+Float TOTAL_SLICE_DURATION = 400.0; // in minutes
 Float LEVEL_SEPARATION = (DIAMETER - START_DIAMTER) / LEVELS;
 Integer MINIMUM_NODE_SEPARATION = 10;
 
@@ -21,7 +21,7 @@ Integer click_position_y = 0;
 Float zoom = 0.0;
 Float rotate_x = 0.0;
 Float rotate_y = 0.0;
-Boolean forLaserCutting = true;
+Boolean forLaserCutting = false;
 Connection connection = null;
 Statement statement = null;
 Float minimumSeparation = 15.0;
@@ -338,26 +338,31 @@ void mouseWheel(MouseEvent event) {
 JSONObject json;
 
 void settings() {
-  //size(1296, 864, OPENGL);
-  size(1296, 864);
+  //fullScreen();
+  size(1000, 800);
 }
 
-void setup() {
-  // file name to change for test data
-  json = loadJSONObject("test_data_7.json");
 
-  /*
+void setup() {
+  smooth();
+  ellipseMode(CENTER);
+  rectMode(CENTER);
+  background(255);
   translate((width / 2), (height / 2));
   
-  Slice slice = new Slice(800.0, 200.0, 10, 5);
+  // file name to change for test data
+  //json = loadJSONObject("test_data_7.json");
+  
+  /*  
+  Slice slice = new Slice(DIAMETER, START_DIAMTER, LEVELS, SUPER_LEVELS);
   slice.generateRandom();
   slice.calculatePositions();
-  slice.drawSlice(0); 
+  slice.drawSlice(0.0); 
+  */
   
   //testDrawNode();
   //testGetCartesian();
   //testDrawGraph();
-  */
   
 }
 
@@ -367,16 +372,19 @@ void draw() {
   ellipseMode(CENTER);
   rectMode(CENTER);
   background(255);
-  translate((width / 2), (height / 2));
   
-  //connectToDatabase();
-  //json = parseJSONObject(getSessionsFromDatabase());
-  //closeConnection();
-  
+  connectToDatabase();
+  json = parseJSONObject(getSessionsFromDatabase());
+  closeConnection();
+
   Slice slice = constructFromJSON(json);
   slice.calculatePositions();
-  slice.printInfo();
+  slice.drawInfo();
+  
+  pushMatrix();
+  translate((width / 2), (height / 2));
   slice.drawSlice(0.0);
+  popMatrix();
   
   delay(200);
 

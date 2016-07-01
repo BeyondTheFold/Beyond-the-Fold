@@ -17,12 +17,12 @@ public class Graph {
     this.duration = 0.0;
         
     // initialize adjacency list
-    adjacencyList = new ArrayList<ArrayList<Node>>(1024);
+    adjacencyList = new ArrayList<ArrayList<Node>>(100000);
     
     // initialize node list
-    nodes = new ArrayList<Node>(1024);
+    nodes = new ArrayList<Node>(100000);
         
-    for(Integer i = 0; i < 1024; ++i) {
+    for(Integer i = 0; i < 100000; ++i) {
      adjacencyList.add(null); 
      nodes.add(null);
     }
@@ -290,7 +290,7 @@ public class Graph {
     }
     
     Integer childCount;
-    Integer takePath;
+    Integer takePath = 0;
 
     if(minChildren == maxChildren) {
       childCount = maxChildren;
@@ -304,9 +304,16 @@ public class Graph {
       ++nodeCount;
       
       // generate random node duration
-      child.setDuration((float)generator.nextInt(10) + 3);
+      child.setDuration((float)generator.nextInt(5) + 1);
       
-      // randomly decide to take path
+      // generate randon number to decide if in same domain
+      Integer inDomain = generator.nextInt(10);
+      if(inDomain > 4) {
+        child.setSubDomain(true);
+      } else {
+        child.setSubDomain(false);
+      }
+      
       takePath = generator.nextInt(100);
       
       child.setParent(parent);
@@ -316,7 +323,7 @@ public class Graph {
       
       if(takePath <= pathProbability) {
         // recursively call create random subgraph
-        createSubgraph(generator, maxDepth, depth + 1, minChildren, maxChildren, child, pathProbability);
+        createSubgraph(generator, maxDepth, depth + 1, 1, 2, child, pathProbability + 10);
       }
     } 
     
@@ -327,10 +334,11 @@ public class Graph {
   
     Random generator = new Random();
     Integer depth = 0;
-    Integer pathProbability = 50;
+    Integer pathProbability = 15;
     Node root = new Node();
     root.setIndex(nodeCount);
     root.setDuration(0.0);
+    root.setSubDomain(false);
     ++nodeCount;
         
     createSubgraph(generator, maxDepth, depth, minChildren, maxChildren, root, pathProbability);    

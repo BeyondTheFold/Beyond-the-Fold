@@ -1,3 +1,7 @@
+// ----------------------------------
+// Web Browsing Visualization Monitor
+// ----------------------------------
+
 // debug flag
 var debug = true;
 
@@ -6,10 +10,15 @@ var sessions = [];
 
 // flag for identifying child sessions
 var childLinkFollowed = false;
+
+// flag for identifying children within a parents domain
 var childWithinDomain = false;
 
-// tab count
-var tabCount = 0;
+// index pointing to current tab
+var currentTab = null;
+
+// array of currently opened tabs
+var tabs = [];
 
 // previous session index visited on tree
 var previousIndex = null;
@@ -65,7 +74,8 @@ function handleCommand(event) {
 	} else if(event.command == 'clear') {
 		if(confirm('Are you sure you want to clear all of the sessions?')) {
 			sessions = [];
-			tabCount = 0;
+			tabs = [];
+			currentTab = null;
 			currentIndex = null;
 			previousIndex = null;
 			localStorage.sessions = '{\'sessions\': []}';
@@ -107,49 +117,71 @@ function saveSessions() {
 
 function getRoot(sessions, index) {
   if(index === -1 || 
-			index === null || 
-			typeof sessions === undefined || 
-			typeof index === undefined ||
-			sessions[index] === null ||
-			typeof sessions[index] === undefined) {
+		 index === null || 
+		 sessions[index] === null ||
+		 typeof sessions === undefined || 
+		 typeof index === undefined ||
+		 typeof sessions[index] === undefined) {
+
     return(null);
   }
 
   var i = index;
 	var iterationCount = 0;
 	var maxIteration = sessions.length;
-	while(typeof sessions[i].parent !== undefined && sessions[i].parent !== -1) {
+
+	// until root node of session at index is found
+	while(true) {
+
+		// detect cycle
 		if(iterationCount >= maxIteration) {
-			debugLog('getRoot(...) stuck in cycle at ' + String(i) + ' and ' + String(sessions[i].parent));
+			debugLog('error: getRoot(...) stuck in cycle at ' + String(i) + ' and ' + String(sessions[i].parent));
 			return(null);
 		}
+
+		// if root session reached then return it's index
+		if(sessions[i].parent == -1) {
+			return(i);
+		}
+
+		// increment iteration count for cycle detection
 		++iterationCount;
-    i = sessions[i].parent;
-		if(i === null) {
-			return(0);
+
+		// move to the next parent node in tree
+		if(typeof sessions[i].parent !== undefined) {
+			i = sessions[i].parent;
+		} else {
+			debugLog('error: getRoot(...) found a session with an undefined parent at index' + i);
+			break;
 		}
   }
-  return(i);
+
+	// in the event that finding the root failed
+  return(null);
 }
 
-function getPreviousIndex() {
+function getPreviousIndex(tab) {
   debugLog('Searching for previous tab');
 
+	// search all sessions
   for(var i = 0; i < sessions.length; ++i) {
-    if(sessions[i].previous === true) {
+
+		// previous session will have same tab index and have previous flag set as true
+    if(sessions[i].previous === true && sessions[i].tab = tab) {
+
       debugLog('Found previous node at ' + String(i));
       
+			// return the session
       return(i);
     }
   }
+
+	// failed to find previous session
   return(null);
 }
 
 function openHandler(openEvent) {
   debugLog("Tab/Page Open");
-
-	// increment tab count
-	++tabCount;
 
   // when new tab or window is opened push parent object
   sessions.push({
@@ -164,33 +196,57 @@ function openHandler(openEvent) {
     'previous': false
   });
 
+	// previous index should be null when a new tab/window opens
   previousIndex = null;
+
+	// current index is the last element in the sessions array	
   currentIndex = sessions.length - 1;
+
+	// current session should be stored in tab
+	tabs.push(currentIndex);
+
+	// set current tab to newly created tab
+	currentTab = tabs.length - 1;
 }
 
 function closeHandler(closeEvent) {
   debugLog("Tab/Page Open");
 
+	// tab should be removed from tab list
+	tabs.splice(currentTab, currentTab + 1);
+
+	// current tab should be set to null
+	currentTab = null;
+
+	// save sessions upon closing a tab/window
   saveSessions();
 }
 
 function activationHandler(activationEvent) {
   debugLog("Tab/Page Activation");
 
-	// MAKE SURE IF THE SAME URL IS OPEN IN TWO TABS IT WILL SET PREVIOUS
-	// AS PROPER PARENT NODE
-	for(var i = 0; i < sessions.length; ++i) {
-		if(sessions[i].url === activationEvent.target.url && sessions[i].current === true) {
-		
+	// search for session in tabs with the same url and tab index
+	for(var i = 0; i < tabs.length; ++i) {
+		if(activationEvent.target.url === sessions[tabs[i]] && 
+			 sessions[tabs[i]].tab === i) {
+
+			// current is the session pointed to by tabs list
+			currentIndex = tabs[i];
+			
+			// define current tab
+			currentTab = i;
 		}
 	}
 
   // get previously active session index in tab
-  //previousIndex = getPreviousIndex();
+  previousIndex = getPreviousIndex(currentIndex.tab);
 }
 
 function deactivationHandler(deactivationEvent) {
+
+	// ensure current index exists
   if(currentIndex !== null && typeof currentIndex !== undefined) {
+
     // calculate session duration before switching sessions
     calculateDuration(currentIndex);
   }
@@ -205,10 +261,12 @@ function beforeNavigationHandler(beforeNavigationEvent) {
 function visited(url) {
   debugLog('Searching visited nodes for URL: ' + url);
 
+	// ignores revisted redirects
 	if(url === "") {
 		return(null);
 	}
   
+	// search sesions for session with matching url and tab index
   for(var i = 0; i < sessions.length; ++i) {
     if(sessions[i].url === url && sessions[i].tab === sessions[currentIndex].tab) {
       return(i);
@@ -314,7 +372,7 @@ function navigationHandler(navigationEvent, tab) {
     // create new session object
     sessions.push({
       'url': navigationEvent.target.url,
-			'tab': tabCount,
+			'tab': currentTab,
       'sessionStart': new Date(),
       'sessionDuration': 0,
       'parent': -1,
@@ -351,6 +409,9 @@ function navigationHandler(navigationEvent, tab) {
     }
   }
 
+	// current tab should now point at current index
+	tabs[currentTab] = currentIndex;
+
   debugLog(sessions);
 }
 
@@ -365,7 +426,7 @@ function beforeSearchHandler(beforeSearchEvent) {
 
   sessions.push({
     'url': beforeSearchEvent.target.url,
-		'tab': tabCount,
+		'tab': currentTab,
     'sessionStart': new Date(),
     'sessionDuration': 0,
     'parent': rootIndex,
@@ -377,6 +438,7 @@ function beforeSearchHandler(beforeSearchEvent) {
 
   previousIndex = rootIndex;
   currentIndex = sessions.length - 1;
+	tabs[currentTab] = currentIndex;
 
 	if(previousIndex !== -1 || previousIndex !== null) {
 		sessions[currentIndex].tab = sessions[previousIndex].tab;

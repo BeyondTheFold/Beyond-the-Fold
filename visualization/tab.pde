@@ -37,11 +37,11 @@ public class Tab {
   void generateRandom() {
     Random generator = new Random();
 
-    Integer randomGraphCount = generator.nextInt(5) + 1;
+    Integer randomGraphCount = generator.nextInt(3) + 2;
     
     for(Integer i = 0; i < randomGraphCount; ++i) {
       Graph graph = new Graph(levelSeparation, levelStartDiameter);
-      graph.generateRandom(10, 0, 3);
+      graph.generateRandom(10, 1, 4);
       
       this.addGraph(graph);
     }
