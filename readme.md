@@ -3,13 +3,15 @@
 ## Overview
 
 Beyond the Fold is a project to visualize a user's path while browsing
-the web. It consists of two components:
+the web. It consists of two software components and one hardware:
 
 - A voluntarily installed web extension to monitor a user's relative position
 - A visualizing tool that can be used to import the graph from localstorage
+- A device that has lights allowing the end user to highlight a slice of time
 
 The intialial end product was intended to be a physical manifestation of
-the paths through time. 
+the paths through time. It was consieved by ![Andrew Doherty](https://github.com/andrewcdoh)
+for his graphic desing thesis.
 
 ![device](https://github.com/BeyondTheFold/Beyond-the-Fold/blob/master/Images/image-1.jpg)
 
@@ -34,6 +36,24 @@ The monitor tracks:
 
 The visualization tool was constructed in a way such that visible page visit's 
 (indicated by a node) can be filtered out by the duration of that visit.
+
+## Device
+
+The final device consisted of an Arduino, LED strips, a sliding potentiometer,
+and a three state switch.
+
+## Contributors
+
+- ![Drew Doherty](https://github.com/andrewcdoh)
+- ![Drew Gunderson](https://github.com/drewgun)
+
+### The Slider
+
+The slider had two modes for selecting slices of time. The mode was selected
+by the three state switch.
+
+- Isolate a single slice
+- Build or highlight all slices up to a selected slice
 
 ## To Do
 - Define minimum and maximum anglular separation between nodes
