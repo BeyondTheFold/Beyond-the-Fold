@@ -32,10 +32,32 @@ The monitor tracks:
 - The uniqueness of a page visit.
 - Whether the page was reached via. a web search.
 
+### Usage
+
+To install and use the browsing monitor you need Safari and developer tools installed.
+One cannot distribute self-signed web extensions and getting Apple to sign this
+particular extension may be difficult due to perceived invasiveness. After
+ensuring developer tools are installed open Safari and execute the following steps:
+
+- Clone the project
+- Go to Develop -> Show Extension Builder
+- Click the plus sign in the bottom left corner to add an extension
+- Select Add Extension 
+- Select the directory in the cloned project called `Browsing-Monitor.safariextension`
+
+The browsing monitor is now active and will automatically track you. This data
+is being pushed to the SQLite database in Safari's localstorage.
+
 ## Visualizer
 
 The visualization tool was constructed in a way such that visible page visit's 
 (indicated by a node) can be filtered out by the duration of that visit.
+
+### Usage
+
+Install the newest version of processing and open `visualization.pde` under
+`Visualisation/visualization/`. The graph should be generated based on the
+data in your Safari localstorage. 
 
 ## Device
 
