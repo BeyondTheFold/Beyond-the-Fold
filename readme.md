@@ -13,6 +13,15 @@ the paths through time.
 
 ![device](https://github.com/BeyondTheFold/Beyond-the-Fold/blob/master/Images/image-1.jpg)
 
+Each pane of acrylic has a polar coordinate graph containing the path of one's website
+visits. 
+
+- Each circular node is a new page visit.
+- Each diamond node is a repeated page visit.
+- Each connecting line or edge between nodes represents visiting a link from another page
+
+![graph](https://github.com/BeyondTheFold/Beyond-the-Fold/blob/master/Images/image-20.jpg)
+
 ## Monitor
 
 The monitor tracks:
