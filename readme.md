@@ -16,11 +16,13 @@ for his graphic design thesis.
 ![device](https://github.com/BeyondTheFold/Beyond-the-Fold/blob/master/Images/image-1.jpg)
 
 Each pane of acrylic has a polar coordinate graph containing the path of one's website
-visits. 
+visits. The full circumference of the graph represents 6 hours of browsing in this
+example but can be adjusted in the source. 
 
 - Each circular node is a new page visit.
 - Each diamond node is a repeated page visit.
 - Each connecting line or edge between nodes represents visiting a link from another page
+- Each tab is divided by a separating line
 
 ![graph](https://github.com/BeyondTheFold/Beyond-the-Fold/blob/master/Images/image-20.jpg)
 
@@ -55,9 +57,9 @@ The visualization tool was constructed in a way such that visible page visit's
 
 ### Usage
 
-Install the newest version of processing and open `visualization.pde` under
-`Visualisation/visualization/`. The graph should be generated based on the
-data in your Safari localstorage. 
+Install the newest version of processing and open 
+`Visualisation/visualization/visualization.pde`. 
+The graph should be generated based on the data in your Safari localstorage. 
 
 ## Device
 
