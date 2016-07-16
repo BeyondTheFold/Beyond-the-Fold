@@ -11,6 +11,8 @@ the web. It consists of two components:
 The intialial end product was intended to be a physical manifestation of
 the paths through time. 
 
+![device](https://github.com/BeyondTheFold/Beyond-the-Fold/blob/master/Images/image-1.jpg)
+
 ## Monitor
 
 The monitor tracks:
