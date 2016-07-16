@@ -27,10 +27,10 @@ visits.
 ## Monitor
 
 The monitor tracks:
-- Duration of a page visit
-- The parent/child relationship between websites
-- The uniqueness of a page visit
-- Whether the page was reached via. a web search
+- Duration of a page visit.
+- The parent/child relationship between websites.
+- The uniqueness of a page visit.
+- Whether the page was reached via. a web search.
 
 ## Visualizer
 
@@ -52,18 +52,9 @@ and a three state switch.
 The slider had two modes for selecting slices of time. The mode was selected
 by the three state switch.
 
-- Isolate a single slice
-- Build or highlight all slices up to a selected slice
+- Isolate a single slice.
+- Build or highlight all slices up to a selected slice.
 
-## To Do
-- Define minimum and maximum anglular separation between nodes
-  - calculate number of nodes that can fit within this separation
-- Find out why first level nodes are connecting
-- Clean up and comment code
-- Ensure nodes aren't drawn after specified threshold is met
-[x] Find out why local storage isn't being updated immediatly
-- Gather data
- 
 ## Short Comings
 - Duration is still counted when user walks away from computer
 
