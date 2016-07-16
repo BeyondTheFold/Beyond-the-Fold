@@ -9,9 +9,9 @@ the web. It consists of two software components and one hardware:
 - A visualizing tool that can be used to import the graph from localstorage
 - A device that has lights allowing the end user to highlight a slice of time
 
-The intialial end product was intended to be a physical manifestation of
-the paths through time. It was consieved by ![Andrew Doherty](https://github.com/andrewcdoh)
-for his graphic desing thesis.
+The initial end product was intended to be a physical manifestation of
+the paths through time. It was conceived by ![Andrew Doherty](https://github.com/andrewcdoh)
+for his graphic design thesis.
 
 ![device](https://github.com/BeyondTheFold/Beyond-the-Fold/blob/master/Images/image-1.jpg)
 
@@ -57,7 +57,4 @@ by the three state switch.
 
 ## Short Comings
 - Duration is still counted when user walks away from computer
-
-
-
 
