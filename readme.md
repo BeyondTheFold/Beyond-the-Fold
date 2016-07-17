@@ -21,8 +21,8 @@ example but can be adjusted in the source.
 
 - Each circular node is a new page visit.
 - Each diamond node is a page visit reached via a search.
-- Each connecting line or edge between nodes represents visiting a link from another page
-- Each tab is divided by a separating line
+- Each connecting line or edge between nodes represents visiting a link from another page.
+- Each tab is divided by a separating line.
 
 ![graph](https://github.com/BeyondTheFold/Beyond-the-Fold/blob/master/Images/image-20.jpg)
 
