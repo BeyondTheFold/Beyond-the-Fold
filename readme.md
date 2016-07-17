@@ -20,7 +20,7 @@ visits. The full circumference of the graph represents 6 hours of browsing in th
 example but can be adjusted in the source. 
 
 - Each circular node is a new page visit.
-- Each diamond node is a repeated page visit.
+- Each diamond node is a page visit reached via a search.
 - Each connecting line or edge between nodes represents visiting a link from another page
 - Each tab is divided by a separating line
 
