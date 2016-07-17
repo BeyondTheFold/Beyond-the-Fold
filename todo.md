@@ -1,4 +1,4 @@
-ite/Visualizer
+Website/Visualizer
 - [ ] Convert visualizer to javascript.
 - [ ] Implement 3D option for viewing visualization.
   - [ ] Add camera view (zoom, pan, rotate).
