@@ -66,11 +66,6 @@ The graph should be generated based on the data in your Safari localstorage.
 The final device consisted of an Arduino, LED strips, a sliding potentiometer,
 and a three state switch.
 
-## Contributors
-
-- ![Drew Doherty](https://github.com/andrewcdoh)
-- ![Drew Gunderson](https://github.com/drewgun)
-
 ### The Slider
 
 The slider had two modes for selecting slices of time. The mode was selected
@@ -79,6 +74,7 @@ by the three state switch.
 - Isolate a single slice.
 - Build or highlight all slices up to a selected slice.
 
-## Short Comings
-- Duration is still counted when user walks away from computer
+## Contributors
 
+- ![Drew Doherty](https://github.com/andrewcdoh)
+- ![Drew Gunderson](https://github.com/drewgun)
