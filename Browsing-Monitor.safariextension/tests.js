@@ -1,6 +1,6 @@
 function assert(condition, message) {
 	if(!condition) {
-		throw message || "Assertion failed";
+		throw message || "Assertion failed.";
 	}
 }
 
